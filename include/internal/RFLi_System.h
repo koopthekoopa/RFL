@@ -45,7 +45,6 @@ RFLErrcode              RFLiBootLoad();
 RFLErrcode              RFLiBootLoadAsync();
 
 RFLiSysManager*         RFLiGetManager();
-#define RFLManager     ((RFLiSysManager*)RFLiGetManager())
 
 void*                   RFLiAlloc(u32 size);
 void*                   RFLiAlloc32(u32 size);

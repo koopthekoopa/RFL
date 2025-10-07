@@ -36,7 +36,7 @@ u32 RFLGetWorkSize(BOOL useDeluxTex) {
 }
 
 static void* allocSys_(u32 size, int alignment) {
-    return MEMAllocFromExpHeapEx(RFLManager->mSystemHeap, size, alignment);
+    return MEMAllocFromExpHeapEx(RFLiGetManager()->mSystemHeap, size, alignment);
 }
 
 RFLErrcode RFLInitResAsync(void* workBuffer, void* resBuffer, u32 resSize, BOOL useDeluxTex) {
@@ -53,7 +53,7 @@ RFLErrcode RFLInitResAsync(void* workBuffer, void* resBuffer, u32 resSize, BOOL 
     else {
         RFLi_REPORT("---------- RVLFaceLib::RFLInit() --------------\n");
 
-        if (RFLManager == NULL) {
+        if (RFLiGetManager() == NULL) {
             // Start to initialize!!!
 
             OSRegisterVersion(__RFLVersion);
@@ -71,7 +71,7 @@ RFLErrcode RFLInitResAsync(void* workBuffer, void* resBuffer, u32 resSize, BOOL 
                 sRFLBrokenType = 0;
 
                 RFLi_REPORT(" manager   : 0x%08x - 0x%08x (%6dByte)\n", (u8*)sRFLManager, ((u8*)sRFLManager + sizeof(RFLiSysManager)), sizeof(RFLiSysManager));
-                RFLManager->mWorkBuffer = ((u8*)workBuffer + sizeof(RFLiSysManager));
+                RFLiGetManager()->mWorkBuffer = ((u8*)workBuffer + sizeof(RFLiSysManager));
             }
 
             // Initialize root heap
@@ -83,33 +83,33 @@ RFLErrcode RFLInitResAsync(void* workBuffer, void* resBuffer, u32 resSize, BOOL 
                 else {
                     size = (RFLi_WORK_BUFFER_SIZE - sizeof(RFLiSysManager));
                 }
-                RFLManager->mRootHeap = MEMCreateExpHeapEx(RFLManager->mWorkBuffer, size, 1);
-                RFLi_REPORT(" rootHeap  : 0x%08x - 0x%08x (%6dByte)\n", (u8*)RFLManager->mWorkBuffer, ((u8*)RFLManager->mWorkBuffer + size), size);
+                RFLiGetManager()->mRootHeap = MEMCreateExpHeapEx(RFLiGetManager()->mWorkBuffer, size, 1);
+                RFLi_REPORT(" rootHeap  : 0x%08x - 0x%08x (%6dByte)\n", (u8*)RFLiGetManager()->mWorkBuffer, ((u8*)RFLiGetManager()->mWorkBuffer + size), size);
             }
 
             // Initialize system heap
             {
                 u32 size = 0x24800;
-                void* buffer = MEMAllocFromExpHeapEx(RFLManager->mRootHeap, size, 32);
-                RFLManager->mSystemHeap = MEMCreateExpHeapEx(buffer, size, 1);
+                void* buffer = MEMAllocFromExpHeapEx(RFLiGetManager()->mRootHeap, size, 32);
+                RFLiGetManager()->mSystemHeap = MEMCreateExpHeapEx(buffer, size, 1);
                 RFLi_REPORT(" systemHeap: 0x%08x - 0x%08x (%6dByte)\n", (u8*)buffer, ((u8*)buffer + size), size);
             }
 
             // Initialize temporary heap
             {
-                u32 size = MEMGetAllocatableSizeForExpHeap(RFLManager->mRootHeap);
-                void* buffer = MEMAllocFromExpHeapEx(RFLManager->mRootHeap, size, 8);
-                RFLManager->mTmpHeap = MEMCreateExpHeapEx(buffer, size, 1);
+                u32 size = MEMGetAllocatableSizeForExpHeap(RFLiGetManager()->mRootHeap);
+                void* buffer = MEMAllocFromExpHeapEx(RFLiGetManager()->mRootHeap, size, 8);
+                RFLiGetManager()->mTmpHeap = MEMCreateExpHeapEx(buffer, size, 1);
                 RFLi_REPORT(" tmpHeap   : 0x%08x - 0x%08x (%6dByte)\n", (u8*)buffer, ((u8*)buffer + size), size);
             }
 
             // Prepare settings
-            RFLManager->mLastErrcode = RFLErrcode_Success;
-            RFLManager->mBeforeCloseErr = RFLErrcode_Success;
-            RFLManager->mLastReason = 0;
-            RFLManager->mBeforeCloseReason = 0;
-            RFLManager->mUseDeluxTex = useDeluxTex;
-            RFLManager->mBrokenTypeList = FALSE;
+            RFLiGetManager()->mLastErrcode = RFLErrcode_Success;
+            RFLiGetManager()->mBeforeCloseErr = RFLErrcode_Success;
+            RFLiGetManager()->mLastReason = 0;
+            RFLiGetManager()->mBeforeCloseReason = 0;
+            RFLiGetManager()->mUseDeluxTex = useDeluxTex;
+            RFLiGetManager()->mBrokenTypeList = FALSE;
 
             // Icon & model
             RFLSetIconDrawDoneCallback(FALSE);
@@ -117,17 +117,17 @@ RFLErrcode RFLInitResAsync(void* workBuffer, void* resBuffer, u32 resSize, BOOL 
             RFLiSetWorking(FALSE);
 
             // Prepare database
-            RFLiInitDatabase(RFLManager->mSystemHeap);
+            RFLiInitDatabase(RFLiGetManager()->mSystemHeap);
             RFLiInitLoader();
-            RFLiInitCtrlBuf(RFLManager->mSystemHeap);
+            RFLiInitCtrlBuf(RFLiGetManager()->mSystemHeap);
             RFLiInitHiddenDatabase();
-            RFLiInitAccessInfo(RFLManager->mSystemHeap);
+            RFLiInitAccessInfo(RFLiGetManager()->mSystemHeap);
 
             // Prepare coordinates
             RFLiSetCoordinateData(&scCoordinate);
 
             // Completed!!!!
-            RFLi_REPORT(" remain    : sys=%8dByte, tmp=%8dByte\n", MEMGetTotalFreeSizeForExpHeap(RFLManager->mSystemHeap), MEMGetTotalFreeSizeForExpHeap(RFLManager->mTmpHeap));
+            RFLi_REPORT(" remain    : sys=%8dByte, tmp=%8dByte\n", MEMGetTotalFreeSizeForExpHeap(RFLiGetManager()->mSystemHeap), MEMGetTotalFreeSizeForExpHeap(RFLiGetManager()->mTmpHeap));
             RFLi_REPORT(" initialize finished.\n");
 
             // Setup cache
@@ -159,12 +159,12 @@ RFLErrcode RFLInitRes(void* workBuffer, void* resBuffer, u32 resSize, BOOL useDe
 }
 
 void RFLExit() {
-    if (RFLManager) {
+    if (RFLiGetManager()) {
         RFLWaitAsync();
 
         sRFLLastErrCode = RFLGetAsyncStatus();
         sRFLLastReason = RFLGetLastReason();
-        sRFLBrokenType = RFLManager->mBrokenTypeList;
+        sRFLBrokenType = RFLiGetManager()->mBrokenTypeList;
 
         if (RFLIsResourceCached()) {
             RFLFreeCachedResource();
@@ -172,9 +172,9 @@ void RFLExit() {
 
         RFLiExitAccessInfo();
 
-        MEMDestroyExpHeap(RFLManager->mTmpHeap);
-        MEMDestroyExpHeap(RFLManager->mSystemHeap);
-        MEMDestroyExpHeap(RFLManager->mRootHeap);
+        MEMDestroyExpHeap(RFLiGetManager()->mTmpHeap);
+        MEMDestroyExpHeap(RFLiGetManager()->mSystemHeap);
+        MEMDestroyExpHeap(RFLiGetManager()->mRootHeap);
 
         sRFLManager = NULL;
 
@@ -212,7 +212,7 @@ BOOL RFLAvailable() {
 }
 
 static void* allocal_(u32 size, int alignment) {
-    void* dst = MEMAllocFromExpHeapEx(RFLManager->mTmpHeap, size, alignment);
+    void* dst = MEMAllocFromExpHeapEx(RFLiGetManager()->mTmpHeap, size, alignment);
     RFLi_ASSERTLINE_NULL(dst, 353);
     return dst;
 }
@@ -226,12 +226,12 @@ void* RFLiAlloc32(u32 size) {
 }
 
 void RFLiFree(void *block)  {
-    MEMFreeToExpHeap(RFLManager->mTmpHeap, block);
+    MEMFreeToExpHeap(RFLiGetManager()->mTmpHeap, block);
 }
 
 u32 RFLiGetUsedWorkSize() {
     if (RFLAvailable()) {
-        MEMiHeapHead* heap = RFLManager->mTmpHeap;
+        MEMiHeapHead* heap = RFLiGetManager()->mTmpHeap;
         return MEMGetAllocatableSizeForExpHeap(heap) - MEMGetTotalFreeSizeForExpHeap(heap);
     }
     else {
@@ -243,32 +243,32 @@ RFLiDatabaseManager* RFLiGetDBManager() {
     if (!RFLAvailable()) {
         return NULL;
     }
-    return &RFLManager->mDBMan;
+    return &RFLiGetManager()->mDBMan;
 }
 
 RFLiHiddenDBManager* RFLiGetHDBManager() {
     if (!RFLAvailable()) {
         return NULL;
     }
-    return &RFLManager->mHDBMan;
+    return &RFLiGetManager()->mHDBMan;
 }
 
 RFLiNANDLoader* RFLiGetLoader() {
     if (!RFLAvailable()) {
         return NULL;
     }
-    return &RFLManager->mLoader;
+    return &RFLiGetManager()->mLoader;
 }
 
 BOOL RFLiGetWorking() {
     if (!RFLAvailable()) {
         return FALSE;
     }
-    return RFLManager->mIsWorking;
+    return RFLiGetManager()->mIsWorking;
 }
 
 void RFLiSetWorking(BOOL b) {
-    RFLManager->mIsWorking = b;
+    RFLiGetManager()->mIsWorking = b;
 }
 
 RFLiSysManager* RFLiGetManager() {
@@ -288,7 +288,7 @@ RFLErrcode RFLGetAsyncStatus() {
         return RFLErrcode_Fatal;
     }
 
-    return RFLManager->mLastErrcode;
+    return RFLiGetManager()->mLastErrcode;
 }
 
 s32 RFLGetLastReason() {
@@ -311,35 +311,35 @@ RFLiNANDAccessInfo* RFLiGetAccInfo(RFLiFileType type) {
     if (!RFLAvailable()) {
         return NULL;
     }
-    return &RFLManager->mAccInfo[type];
+    return &RFLiGetManager()->mAccInfo[type];
 }
 
 RFLiCtrlManager* RFLiGetCtrlBufManager() {
     if (!RFLAvailable()) {
         return NULL;
     }
-    return &RFLManager->mCtrlMan;
+    return &RFLiGetManager()->mCtrlMan;
 }
 
 BOOL RFLiGetUseDeluxTex() {
     if (!RFLAvailable()) {
         return FALSE;
     }
-    return RFLManager->mUseDeluxTex;
+    return RFLiGetManager()->mUseDeluxTex;
 }
 
 s32 RFLiGetLastReason() {
     if (!RFLAvailable()) {
         return FALSE;
     }
-    return RFLManager->mLastReason;
+    return RFLiGetManager()->mLastReason;
 }
 
 BOOL RFLiSetMacAddr(const u8* addr) {
     if (!RFLAvailable()) {
         return FALSE;
     }
-    memcpy(RFLManager->macaddr, addr, 6);
+    memcpy(RFLiGetManager()->macaddr, addr, 6);
     return TRUE;
 }
 
@@ -347,7 +347,7 @@ u8* RFLiGetMacAddr() {
     if (!RFLAvailable()) {
         return FALSE;
     }
-    return RFLManager->macaddr;
+    return RFLiGetManager()->macaddr;
 }
 
 void RFLiSetFileBroken(RFLiFileBrokenType type) {
@@ -355,13 +355,13 @@ void RFLiSetFileBroken(RFLiFileBrokenType type) {
     if (!RFLAvailable()) {
         return;
     }
-    RFLManager->mBrokenTypeList |= (u8)(1 << type);
+    RFLiGetManager()->mBrokenTypeList |= (u8)(1 << type);
 }
 
 BOOL RFLiNotFoundError() {
     u8* list = &sRFLBrokenType;
     if (RFLAvailable()) {
-        list = &RFLManager->mBrokenTypeList;
+        list = &RFLiGetManager()->mBrokenTypeList;
     }
     return (*list & (1 << RFLiFileBrokenType_DBNotFound)) ? TRUE : FALSE;
 }
@@ -369,7 +369,7 @@ BOOL RFLiNotFoundError() {
 BOOL RFLiNeedRepairError() {
     u8* list = &sRFLBrokenType;
     if (RFLAvailable()) {
-        list = &RFLManager->mBrokenTypeList;
+        list = &RFLiGetManager()->mBrokenTypeList;
     }
     return (*list & (1 << RFLiFileBrokenType_DBBroken)) ? TRUE : FALSE;
 }
@@ -379,7 +379,7 @@ BOOL RFLiCriticalError() {
     BOOL ret;
 
     if (RFLAvailable()) {
-        list = &RFLManager->mBrokenTypeList;
+        list = &RFLiGetManager()->mBrokenTypeList;
     }
 
     ret = (*list & (1 << RFLiFileBrokenType_ResBroken)) || (*list & (1 << RFLiFileBrokenType_Corrupt));

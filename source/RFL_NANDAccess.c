@@ -49,7 +49,7 @@ void RFLiStartWorking() {
     b = OSDisableInterrupts();
 
     RFLiSetWorking(TRUE);
-    RFLManager->mLastErrcode = RFLErrcode_Busy;
+    RFLiGetManager()->mLastErrcode = RFLErrcode_Busy;
 
     OSRestoreInterrupts(b);
 }
@@ -61,9 +61,9 @@ static void startWorkingClose_() {
     b = OSDisableInterrupts();
 
     RFLiSetWorking(TRUE);
-    RFLManager->mBeforeCloseErr = RFLManager->mLastErrcode;
-    RFLManager->mBeforeCloseReason = RFLManager->mLastReason;
-    RFLManager->mLastErrcode = RFLErrcode_Busy;
+    RFLiGetManager()->mBeforeCloseErr = RFLiGetManager()->mLastErrcode;
+    RFLiGetManager()->mBeforeCloseReason = RFLiGetManager()->mLastReason;
+    RFLiGetManager()->mLastErrcode = RFLErrcode_Busy;
 
     OSRestoreInterrupts(b);
 }
@@ -76,12 +76,12 @@ static void endWorkingCloseReason_(RFLErrcode errcode, s32 reason) {
 
     RFLiSetWorking(FALSE);
     if (errcode == RFLErrcode_Success) {
-        RFLManager->mLastErrcode = RFLManager->mBeforeCloseErr;
-        RFLManager->mLastReason = RFLManager->mBeforeCloseErr; // @BUG Should be mBeforeCloseReason
+        RFLiGetManager()->mLastErrcode = RFLiGetManager()->mBeforeCloseErr;
+        RFLiGetManager()->mLastReason = RFLiGetManager()->mBeforeCloseErr; // @BUG Should be mBeforeCloseReason
     }
     else {
-        RFLManager->mLastErrcode = errcode;
-        RFLManager->mLastReason = reason;
+        RFLiGetManager()->mLastErrcode = errcode;
+        RFLiGetManager()->mLastReason = reason;
     }
 
     OSRestoreInterrupts(b);
@@ -95,14 +95,14 @@ void RFLiEndWorkingReason(RFLErrcode errcode, s32 reason) {
     BOOL b;
     RFLi_ASSERTLINE(RFLAvailable(), 238);
 
-    switch (RFLManager->mLastErrcode) {
+    switch (RFLiGetManager()->mLastErrcode) {
         case RFLErrcode_Busy:
         case RFLErrcode_Success: {
             b = OSDisableInterrupts();
 
             RFLiSetWorking(FALSE);
-            RFLManager->mLastErrcode = errcode;
-            RFLManager->mLastReason = reason;
+            RFLiGetManager()->mLastErrcode = errcode;
+            RFLiGetManager()->mLastReason = reason;
 
             OSRestoreInterrupts(b);
             break;
