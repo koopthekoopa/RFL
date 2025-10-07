@@ -1,0 +1,17 @@
+.cache/
+.private/*
+.vscode/*
+__pycache__/*
+asm/*
+build/*
+lib/*
+orig/*
+obj/*
+tools/*
+*.ninja*
+compile_commands.json
+objdiff.json
+*.py
+*.lnk
+*.zip
+*.bat
