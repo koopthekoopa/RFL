@@ -4,7 +4,7 @@
 #include <RFL_Types.h>
 #include <internal/RFLi_Types.h>
 
-#include <internal/RFLi_Format.h>
+#include <internal/RFLi_HiddenDatabase.h>
 
 #include <revolution/os/OSAlarm.h>
 #include <revolution/mem.h>
@@ -12,15 +12,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-typedef struct {
-    u32 identifier; // 0x0
-    s16 head; // 0x4
-    s16 tail; // 0x6
-    RFLiFormatTable data[100* 100]; // 0x8
-    u8 padding[22]; // 0x1D4C8
-    u16 crc; // 0x1D4DE
-} RFLiDatabaseHidden;
 
 typedef struct {
     void* head; // 0x0
@@ -41,7 +32,7 @@ typedef struct {
     u8 month_nwc24; // 0x1CFD
     u8 day_nwc24; // 0x1CFE
     u8 padding2; // 0x1CFF
-    RFLiDatabaseHidden hidden; // 0x1D00
+    RFLiHiddenDatabase hidden; // 0x1D00
 } RFLiDatabase;
 
 typedef struct {
@@ -100,7 +91,7 @@ BOOL                RFLiIsValidName2(const RFLiCharInfo* data);
 BOOL                RFLiGetIsolation();
 BOOL                RFLiSetIsolation(BOOL isolation);
 
-RFLiDatabaseHidden* RFLiGetHiddenHeader();
+RFLiHiddenDatabase* RFLiGetHiddenHeader();
 
 BOOL                RFLiDBIsLoaded();
 

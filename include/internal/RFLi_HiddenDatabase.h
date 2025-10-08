@@ -8,9 +8,22 @@
 
 #include <internal/RFLi_Controller.h>
 
+#include <internal/RFLi_Format.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#define RFLi_HIDDEN_DB_IDENTIFIER   'RNHD'
+
+typedef struct {
+    u32 identifier; // 0x0
+    s16 head; // 0x4
+    s16 tail; // 0x6
+    RFLiFormatTable data[100* 100]; // 0x8
+    u8 padding[22]; // 0x1D4C8
+    u16 crc; // 0x1D4DE
+} RFLiHiddenDatabase;
 
 typedef struct {
     RFLiHiddenCharData data[100]; // 0x0
@@ -19,7 +32,7 @@ typedef struct {
 } RFLiHiddenDBList;
 
 typedef struct {
-    int loaded; // 0x0
+    BOOL loaded; // 0x0
     int readError; // 0x4
     void* writeTmp; // 0x8
     s16 writeIndex; // 0xC

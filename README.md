@@ -13,7 +13,7 @@ Progress
 ✔️ = Matching  
 ❌ = Not matching  
 
-|     Translation Unit    | Debug | Release |
+|          Source         | Debug | Release |
 |-------------------------|-------|---------|
 | `RFL_System.c`          | ❌ | ✔️ |
 | `RFL_NANDLoader.c`      | ✔️ | ✔️ |
@@ -29,7 +29,7 @@ Progress
 | `RFL_DefaultDatabase.c` | ❌ | ❌ |
 | `RFL_DataUtility.c`     | ✔️ | ✔️ |
 | `RFL_NWC24.c`           | ❌ | ❌ |
-| `RFL_Format.c`          | ❌ | ❌ |
+| `RFL_Format.c`          | ✔️ | ✔️ |
 
 Resources used
 --------------

@@ -29,7 +29,7 @@ void RFLiInitLoader() {
 }
 
 static void parseOnmemoryRes_() {
-    RFLiNANDLoader* loader = RFLiGetLoader(); // r30
+    RFLiNANDLoader* loader = RFLiGetLoader();
     s32* offset;
     s32 headerpos;
     int i;
@@ -312,7 +312,7 @@ static u32 getLength_(RFLiArcID arcID, u16 index) {
 }
 
 static void* getCachedFile_(void* dst, RFLiNANDLoader* loader, RFLiArcID arcID, u16 index) {
-    RFLiNANDArchive* arc; // r31
+    RFLiNANDArchive* arc;
     void* ret;
     u8* head;
     u32* pos;
