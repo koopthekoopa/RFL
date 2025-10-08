@@ -53,6 +53,8 @@ typedef struct NANDCommandBlock {
     int simpleFlag; // 0xB8
 } NANDCommandBlock;
 
+typedef void (*NANDCallback)(s32 result, NANDCommandBlock* block);
+
 enum {
     NAND_RESULT_FATAL_ERROR = -128,
     NAND_RESULT_UNKNOWN = -64,
@@ -116,15 +118,32 @@ enum {
 
 /* Main */
 
-s32 NANDRead(NANDFileInfo* info, void* buffer, u32 length);
+s32     NANDRead(NANDFileInfo* info, void* buffer, u32 length);
+s32     NANDReadAsync(NANDFileInfo* info, void* buffer, u32 length, NANDCallback callback, NANDCommandBlock* block);
 
-s32 NANDSeek(NANDFileInfo* info, s32 offset, s32 whence);
+s32     NANDWriteAsync(NANDFileInfo* info, const void* buffer, u32 length, NANDCallback callback, NANDCommandBlock* block);
 
-s32 NANDClose(NANDFileInfo* info);
+s32     NANDSeek(NANDFileInfo* info, s32 offset, s32 whence);
+s32     NANDSeekAsync(NANDFileInfo* info, s32 offset, s32 whence, NANDCallback callback, NANDCommandBlock* block);
+
+s32     NANDGetLengthAsync(NANDFileInfo* info, u32* length, NANDCallback callback, NANDCommandBlock* block);
+
+s32     NANDClose(NANDFileInfo* info);
+s32     NANDSafeCloseAsync(NANDFileInfo* info, NANDCallback callback, NANDCommandBlock* block);
+
+void    NANDSetUserData(NANDCommandBlock* block, void* data);
+void*   NANDGetUserData(NANDCommandBlock* block);
 
 /* Private */
 
-s32 NANDPrivateOpen(const char* path, NANDFileInfo* info, u8 accType);
+s32     NANDPrivateCreateAsync(const char* path, u8 perm, u8 attr, NANDCallback callback, NANDCommandBlock* block);
+
+s32     NANDPrivateOpen(const char* path, NANDFileInfo* info, u8 accType);
+s32     NANDPrivateSafeOpenAsync(const char* path, NANDFileInfo* info, u8 accType, void* buffer, u32 length, NANDCallback callback, NANDCommandBlock* block);
+
+s32     NANDPrivateDeleteAsync(const char* path, NANDCallback callback, NANDCommandBlock* block);
+
+s32     NANDPrivateCreateDirAsync(const char* path, u8 perm, u8 attr, NANDCallback callback, NANDCommandBlock* block);
 
 #ifdef __cplusplus
 }

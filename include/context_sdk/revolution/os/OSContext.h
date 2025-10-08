@@ -8,21 +8,21 @@ extern "C" {
 #endif
 
 typedef struct OSContext {
-    unsigned long gpr[32]; // 0x0
-    unsigned long cr; // 0x80
-    unsigned long lr; // 0x84
-    unsigned long ctr; // 0x88
-    unsigned long xer; // 0x8C
-    double fpr[32]; // 0x90
-    unsigned long fpscr_pad; // 0x190
-    unsigned long fpscr; // 0x194
-    unsigned long srr0; // 0x198
-    unsigned long srr1; // 0x19C
-    unsigned short mode; // 0x1A0
-    unsigned short state; // 0x1A2
-    unsigned long gqr[8]; // 0x1A4
-    unsigned long psf_pad; // 0x1C4
-    double psf[32]; // 0x1C8
+    u32 gpr[32]; // 0x0
+    u32 cr; // 0x80
+    u32 lr; // 0x84
+    u32 ctr; // 0x88
+    u32 xer; // 0x8C
+    f64 fpr[32]; // 0x90
+    u32 fpscr_pad; // 0x190
+    u32 fpscr; // 0x194
+    u32 srr0; // 0x198
+    u32 srr1; // 0x19C
+    u16 mode; // 0x1A0
+    u16 state; // 0x1A2
+    u32 gqr[8]; // 0x1A4
+    u32 psf_pad; // 0x1C4
+    f64 psf[32]; // 0x1C8
 } OSContext;
 
 #ifdef __cplusplus

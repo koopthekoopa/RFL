@@ -4,8 +4,6 @@
 #include <stddef.h>
 #include <stdarg.h>
 
-#include <internal/file_struct.h>
-
 #ifndef __cplusplus
 typedef unsigned short wchar_t;
 #endif
@@ -13,8 +11,6 @@ typedef unsigned short wchar_t;
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-int         fwide(FILE* stream, int mode);
 
 wchar_t*    wmemcpy(wchar_t* dest, const wchar_t* src, size_t num);
 wchar_t*    wmemset(wchar_t* dest, wchar_t ch, size_t num);

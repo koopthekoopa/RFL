@@ -52,7 +52,7 @@ typedef struct {
     RFLSimpleCB callback; // 0x0
     union { // inferred
         struct {
-            s8 filename[65]; // 0x0
+            char filename[65]; // 0x0
             u8 openmode; // 0x41
             u8 permission; // 0x42
             u8 attribute; // 0x43
@@ -74,12 +74,12 @@ typedef struct {
             u32* dst; // 0x0
         } getlengthinfo; // 0x4
     };
-    struct NANDFileInfo workingFile; // 0x48
-    struct NANDCommandBlock commandBlock; // 0xD4
+    NANDFileInfo workingFile; // 0x48
+    NANDCommandBlock commandBlock; // 0xD4
     RFLiCallbackTag callbackTag; // 0x190
     OSAlarm alarm; // 0x198
     RFLiFileType alarmdata; // 0x1C8
-    void (* retryCallback)(u32); // 0x1CC
+    RFLSimpleCBArg retryCallback; // 0x1CC
     u8 retryCount; // 0x1D0
     void* safeBuffer; // 0x1D4
     u8 opened; // 0x1D8
@@ -106,7 +106,7 @@ RFLErrcode          RFLiReadAsync(RFLiFileType type, void* dst, u32 size, RFLSim
 RFLErrcode          RFLiWriteAsync(RFLiFileType type, void* src, u32 size, RFLSimpleCB cb, s32 seek_ofs);
 RFLErrcode          RFLiCloseAsync(RFLiFileType type, RFLSimpleCB cb);
 RFLErrcode          RFLiGetLengthAsync(RFLiFileType type, u32* dst, RFLSimpleCB cb);
-RFLErrcode          RFLiDeleteAsync(RFLiFileType type, u32* dst, RFLSimpleCB cb);
+RFLErrcode          RFLiDeleteAsync(RFLiFileType type, RFLSimpleCB cb);
 RFLErrcode          RFLiCreateSaveDirAsync(RFLSimpleCB cb);
 
 #ifdef __cplusplus

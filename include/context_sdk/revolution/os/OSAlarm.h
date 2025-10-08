@@ -11,9 +11,11 @@ extern "C" {
 
 typedef struct OSAlarm OSAlarm;
 
+typedef void (*OSAlarmHandler)(OSAlarm* alarm, OSContext* context);
+
 struct OSAlarm {
-    void (*handler)(OSAlarm*, OSContext*); // 0x0
-    unsigned long tag; // 0x4
+    OSAlarmHandler handler; // 0x0
+    u32 tag; // 0x4
     long long fire; // 0x8
     struct OSAlarm * prev; // 0x10
     struct OSAlarm * next; // 0x14
@@ -23,7 +25,15 @@ struct OSAlarm {
 };
 
 void    OSCreateAlarm(OSAlarm* alarm);
+void    OSSetAlarm(OSAlarm* alarm, s64 start, OSAlarmHandler handler);
 void    OSCancelAlarm(OSAlarm* alarm);
+
+void    OSSetPeriodicAlarm(OSAlarm* alarm, s64 start, s64 period, OSAlarmHandler handler);
+
+void    OSSetAlarmTag(OSAlarm* alarm, u32 tag);
+
+void    OSSetAlarmUserData(OSAlarm* alarm, void* userData);
+void*   OSGetAlarmUserData(OSAlarm* alarm);
 
 #ifdef __cplusplus
 }

@@ -10,6 +10,8 @@ extern "C" {
 extern void OSReport(const char* format, ...);
 extern void OSPanic(const char* fileName, int line, const char* format, ...);
 
+#define OSHalt(msg, line)   OSPanic(__FILE__, line, msg)
+
 #ifdef __cplusplus
 }
 #endif

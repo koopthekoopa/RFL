@@ -8,7 +8,7 @@ typedef signed long long    s64;
 typedef unsigned char       u8;
 typedef unsigned short      u16;
 typedef unsigned long       u32;
-typedef unsigned long long  u64;
+typedef unsigned long  u64;
 
 typedef volatile u8         vu8;
 typedef volatile u16        vu16;
@@ -41,5 +41,11 @@ typedef int                 BOOL;
 
 #define ALIGN32                 ATTRIBUTE_ALIGN(DEFAULT_ALIGN)
 #define ALIGN64                 ATTRIBUTE_ALIGN(64)
+
+#ifdef __MWERKS__
+#define ADDRESS(addr) : (addr)
+#else
+#define ADDRESS(addr)
+#endif
 
 #endif // REVOLUTION_TYPES_H

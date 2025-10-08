@@ -34,8 +34,8 @@ typedef struct OSThreadQueue {
 
 struct OSThread {
     OSContext context; // 0x0
-    unsigned short state; // 0x2C8
-    unsigned short attr; // 0x2CA
+    u16 state; // 0x2C8
+    u16 attr; // 0x2CA
     long suspend; // 0x2CC
     long priority; // 0x2D0
     long base; // 0x2D4
@@ -46,8 +46,8 @@ struct OSThread {
     OSMutex * mutex; // 0x2F0
     OSMutexQueue queueMutex; // 0x2F4
     OSThreadLink linkActive; // 0x2FC
-    unsigned char * stackBase; // 0x304
-    unsigned long * stackEnd; // 0x308
+    u8 * stackBase; // 0x304
+    u32 * stackEnd; // 0x308
     long error; // 0x30C
     void * specific[2]; // 0x310
 };
