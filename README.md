@@ -26,7 +26,7 @@ Progress
 | `RFL_Controller.c`      | ❌ | ❌ |
 | `RFL_MiddleDatabase.c`  | ❌ | ❌ |
 | `RFL_MakeRandomFace.c`  | ❌ | ❌ |
-| `RFL_DefaultDatabase.c` | ❌ | ❌ |
+| `RFL_DefaultDatabase.c` | ✔️ | ✔️ |
 | `RFL_DataUtility.c`     | ✔️ | ✔️ |
 | `RFL_NWC24.c`           | ❌ | ❌ |
 | `RFL_Format.c`          | ✔️ | ✔️ |
