@@ -30,7 +30,7 @@ void RFLiClearDBBuffer() {
     header->head = -1;
     header->tail = -1;
 
-    for (i = 0; i < (100 * 100); i++) {
+    for (i = 0; i < RFL_MAX_HIDDEN_DB; i++) {
         RFLiClearTableData(&header->data[i]);
     }
 }
@@ -60,7 +60,7 @@ static void formatWriteCallback_() {
             manager->formatIndex += 1250;
         }
 
-        if (manager->formatIndex < (100 * 100)) {
+        if (manager->formatIndex < RFL_MAX_HIDDEN_DB) {
             s32 offset = manager->formatIndex * 64;
             s32 i;
 

@@ -4,6 +4,8 @@
 #include <RFL_Types.h>
 #include <internal/RFLi_Types.h>
 
+#include <RFL_Database.h>
+
 #include <internal/RFLi_HiddenDatabase.h>
 
 #include <revolution/os/OSAlarm.h>
@@ -25,7 +27,7 @@ typedef struct {
 
 typedef struct {
     u32 identifier; // 0x0
-    RFLiCharData rawdata[100]; // 0x4
+    RFLiCharData rawdata[RFL_MAX_DATABASE]; // 0x4
     u32 isolation : 1; // 0x1CEC
     u32 padding1 : 31; // 0x1CEC
     u8 specialInvite[13]; // 0x1CF0

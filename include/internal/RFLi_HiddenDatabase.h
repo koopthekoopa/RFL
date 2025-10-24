@@ -7,6 +7,7 @@
 #include <internal/RFLi_Types.h>
 
 #include <internal/RFLi_Controller.h>
+#include <RFL_Database.h>
 
 #include <internal/RFLi_Format.h>
 
@@ -16,17 +17,19 @@ extern "C" {
 
 #define RFLi_HIDDEN_DB_IDENTIFIER   'RNHD'
 
+#define RFL_MAX_HIDDEN_DB   (10000)
+
 typedef struct {
     u32 identifier; // 0x0
     s16 head; // 0x4
     s16 tail; // 0x6
-    RFLiFormatTable data[100* 100]; // 0x8
+    RFLiFormatTable data[RFL_MAX_HIDDEN_DB]; // 0x8
     u8 padding[22]; // 0x1D4C8
     u16 crc; // 0x1D4DE
 } RFLiHiddenDatabase;
 
 typedef struct {
-    RFLiHiddenCharData data[100]; // 0x0
+    RFLiHiddenCharData data[RFL_MAX_DATABASE]; // 0x0
     u8 num; // 0x1900
     u8 current; // 0x1901
 } RFLiHiddenDBList;

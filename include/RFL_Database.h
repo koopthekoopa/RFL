@@ -8,6 +8,8 @@
 extern "C" {
 #endif
 
+#define RFL_MAX_DATABASE   (100)
+
 BOOL        RFLIsAvailableOfficialData(u16 index);
 u16         RFLGetAvailableOfficialDataNum();
 BOOL        RFLSearchOfficialData(const RFLCreateID* id, u16* index);

@@ -44,8 +44,6 @@ typedef struct {
 RFLErrcode              RFLiBootLoad();
 RFLErrcode              RFLiBootLoadAsync();
 
-RFLiSysManager*         RFLiGetManager();
-
 void*                   RFLiAlloc(u32 size);
 void*                   RFLiAlloc32(u32 size);
 void                    RFLiFree(void* block);

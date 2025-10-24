@@ -4,6 +4,7 @@
 #include <RFL_Types.h>
 #include <internal/RFLi_Types.h>
 
+#include <RFL_Database.h>
 #include <RFL_MiddleDatabase.h>
 
 #include <revolution/mem.h>
@@ -12,6 +13,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#define RFL_MAX_CTRL_BUFFER 10
 
 typedef enum {
     RFLiCtrlCheckType_Both = 0,
@@ -23,13 +26,13 @@ typedef struct {
     u32 mIdentifier; // 0x0
     u16 mSecretFlag; // 0x4
     u16 padding1; // 0x6
-    RFLiCharData mData[10]; // 0x8
+    RFLiCharData mData[RFL_MAX_CTRL_BUFFER]; // 0x8
     u16 mDeleted; // 0x2EC
     u16 mCheckSum; // 0x2EE
 } RFLiCtrlBuffer;
 
 typedef struct {
-    u8 isDelete[100]; // 0x0
+    u8 isDelete[RFL_MAX_DATABASE]; // 0x0
 } RFLiCtrlWritableList;
 
 typedef struct {
