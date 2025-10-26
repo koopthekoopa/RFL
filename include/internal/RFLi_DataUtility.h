@@ -1,7 +1,7 @@
 #ifndef RFLi_DATA_UTILITY_H
 #define RFLi_DATA_UTILITY_H
 
-#include <internal/RFLi_Config.h>
+#include <internal/RFLi_LibConfig.h>
 
 #include <RFL_Types.h>
 #include <internal/RFLi_Types.h>

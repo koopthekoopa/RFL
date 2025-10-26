@@ -7,6 +7,7 @@
 #endif
 #define NULL (void*)0
 
+#define DEFAULT_DATA_COUNT  ((int)sizeof(scDefaultData)/sizeof(scDefaultData[0]))
 static const u8 scDefaultData[][sizeof(RFLiCharData)] = {
     /* GUEST A */
     {
@@ -71,8 +72,8 @@ static const u8 scDefaultData[][sizeof(RFLiCharData)] = {
 };
 
 RFLiCharData* RFLiGetDefaultDataPtr(u16 index) {
-    RFLi_ASSERTLINE_RANGE(index, 0, 6, 152);
-    if (index >= 6) {
+    RFLi_ASSERTLINE_RANGE(index, 0, DEFAULT_DATA_COUNT, 152);
+    if (index >= DEFAULT_DATA_COUNT) {
         return NULL;
     }
     else {
@@ -82,7 +83,7 @@ RFLiCharData* RFLiGetDefaultDataPtr(u16 index) {
 
 void RFLiGetDefaultData(RFLiCharInfo* info, u16 index) {
     RFLi_ASSERTLINE_NULL(info, 172);
-    RFLi_ASSERTLINE_RANGE(index, 0, 6, 173);
+    RFLi_ASSERTLINE_RANGE(index, 0, DEFAULT_DATA_COUNT, 173);
 
     RFLiConvertRaw2Info((RFLiCharData*)scDefaultData[index], info);
 }
@@ -96,7 +97,7 @@ int RFLSearchDefaultData(const RFLCreateID* id, u16* index) {
         return FALSE;
     }
     
-    for (i = 0; i < 6; i++) {
+    for (i = 0; i < DEFAULT_DATA_COUNT; i++) {
         if (RFLiIsSameID((RFLCreateID*)&((RFLiCharData*)scDefaultData[i])->createID, id)) {
             ret = TRUE;
             break;

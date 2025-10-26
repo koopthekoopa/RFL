@@ -2,6 +2,7 @@
 #define RFLi_DEBUG_H
 
 #include <RFL_Types.h>
+#include <internal/RFLi_LibConfig.h>
 
 #include <revolution/os/OSError.h>
 
@@ -15,7 +16,7 @@ extern "C" {
 #define NULL 0
 
 
-#ifdef DEBUG
+#ifdef RFL_DEBUG
 
 #define RFLi_REPORT(...)                            OSReport(__VA_ARGS__)
 

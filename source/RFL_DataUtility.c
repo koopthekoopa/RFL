@@ -3,75 +3,63 @@
 
 #include <string.h>
 
-static const u8 RFLi_EYE_ROT_OFFSET[50] = {
-    0x1D, 0x1C, 0x1C, 0x1C, 0x1D, 0x1C, 0x1C, 0x1C,
-    0x1D, 0x1C, 0x1C, 0x1C, 0x1C, 0x1D, 0x1D, 0x1C,
-    0x1C, 0x1C, 0x1D, 0x1D, 0x1C, 0x1D, 0x1C, 0x1D,
-	0x1D, 0x1C, 0x1D, 0x1C, 0x1C, 0x1D, 0x1C, 0x1C,
-    0x1C, 0x1D, 0x1D, 0x1D, 0x1C, 0x1C, 0x1D, 0x1D,
-    0x1D, 0x1C, 0x1C, 0x1D, 0x1D, 0x1D, 0x1D, 0x1D,
-    0x1C, 0x1C
-};
-static const u8 RFLi_EYEBROW_ROT_OFFSET[24] = {
-    0x1A, 0x1A, 0x1B, 0x19, 0x1A, 0x19, 0x1A, 0x19,
-    0x1C, 0x19, 0x1A, 0x18, 0x1B, 0x1B, 0x1A, 0x1A,
-    0x19, 0x19, 0x1A, 0x1A, 0x1B, 0x1A, 0x19, 0x1B
-};
+#include <internal/RFLi_FaceConfig.h>
+#include <internal/RFLi_FaceConfig/offsets.h>
 
-#define CHECK_BOOL(name, var)       if (!(var))          { RFLi_REPORT("Invalid "name" data."); return FALSE; }
+#define CHECK_BOOL(name, var)   if (!(var)) { RFLi_REPORT("Invalid "name" data."); return FALSE; }
 BOOL RFLiCheckValidInfo(const RFLiCharInfo* info) {
-    CHECK_BOOL("FACELINE",      info->faceline.type <= 7);
-    CHECK_BOOL("FACELINE",      info->faceline.color <= 5);
-    CHECK_BOOL("FACELINE",      info->faceline.texture <= 11);
+    CHECK_BOOL("FACELINE",      info->faceline.type <= RFLi_FACELINE_TYPE_MAX);
+    CHECK_BOOL("FACELINE",      info->faceline.color <= RFLi_FACELINE_COLOR_MAX);
+    CHECK_BOOL("FACELINE",      info->faceline.texture <= RFLi_FACELINE_TEX_MAX);
 
-    CHECK_BOOL("HAIR",          info->hair.type <= 71);
-    CHECK_BOOL("HAIR",          info->hair.color <= 7);
-    CHECK_BOOL("HAIR",          info->hair.flip <= 1);
+    CHECK_BOOL("HAIR",          info->hair.type <= RFLi_HAIR_TYPE_MAX);
+    CHECK_BOOL("HAIR",          info->hair.color <= RFLi_HAIR_COLOR_MAX);
+    CHECK_BOOL("HAIR",          info->hair.flip <= RFLi_HAIR_FLIP_MAX);
 
-    CHECK_BOOL("EYE",           info->eye.type <= 47);
-    CHECK_BOOL("EYE",           info->eye.color <= 5);
-    CHECK_BOOL("EYE",           info->eye.scale <= 7);
-    CHECK_BOOL("EYE",           info->eye.rotate <= 7);
-    CHECK_BOOL("EYE",           info->eye.x <= 12);
-    CHECK_BOOL("EYE",           info->eye.y <= 18);
+    CHECK_BOOL("EYE",           info->eye.type <= RFLi_EYE_TYPE_MAX);
+    CHECK_BOOL("EYE",           info->eye.color <= RFLi_EYE_COLOR_MAX);
+    CHECK_BOOL("EYE",           info->eye.scale <= RFLi_EYE_SCALE_MAX);
+    CHECK_BOOL("EYE",           info->eye.rotate <= RFLi_EYE_ROT_MAX);
+    CHECK_BOOL("EYE",           info->eye.x <= RFLi_EYE_X_MAX);
+    CHECK_BOOL("EYE",           info->eye.y <= RFLi_EYE_Y_MAX);
 
-    CHECK_BOOL("EYEBROW",       info->eyebrow.type <= 23);
-    CHECK_BOOL("EYEBROW",       info->eyebrow.color <= 7);
-    CHECK_BOOL("EYEBROW",       info->eyebrow.scale <= 8);
-    CHECK_BOOL("EYEBROW",       info->eyebrow.rotate <= 11);
-    CHECK_BOOL("EYEBROW",       info->eyebrow.x <= 12);
-    CHECK_BOOL("EYEBROW",       info->eyebrow.y >= 3);
-    CHECK_BOOL("EYEBROW",       info->eyebrow.y <= 18);
+    CHECK_BOOL("EYEBROW",       info->eyebrow.type <= RFLi_EYEBROW_TYPE_MAX);
+    CHECK_BOOL("EYEBROW",       info->eyebrow.color <= RFLi_EYEBROW_COLOR_MAX);
+    CHECK_BOOL("EYEBROW",       info->eyebrow.scale <= RFLi_EYEBROW_SCALE_MAX);
+    CHECK_BOOL("EYEBROW",       info->eyebrow.rotate <= RFLi_EYEBROW_ROT_MAX);
+    CHECK_BOOL("EYEBROW",       info->eyebrow.x <= RFLi_EYEBROW_X_MAX);
+    CHECK_BOOL("EYEBROW",       info->eyebrow.y >= RFLi_EYEBROW_Y_MIN);
+    CHECK_BOOL("EYEBROW",       info->eyebrow.y <= RFLi_EYEBROW_Y_MAX);
 
-    CHECK_BOOL("NOSE",          info->nose.type <= 11);
-    CHECK_BOOL("NOSE",          info->nose.scale <= 8);
-    CHECK_BOOL("NOSE",          info->nose.y <= 18);
+    CHECK_BOOL("NOSE",          info->nose.type <= RFLi_NOSE_TYPE_MAX);
+    CHECK_BOOL("NOSE",          info->nose.scale <= RFLi_NOSE_SCALE_MAX);
+    CHECK_BOOL("NOSE",          info->nose.y <= RFLi_NOSE_Y_MAX);
 
-    CHECK_BOOL("MOUTH",         info->mouth.type <= 23);
-    CHECK_BOOL("MOUTH",         info->mouth.color <= 2);
-    CHECK_BOOL("MOUTH",         info->mouth.scale <= 8);
-    CHECK_BOOL("MOUTH",         info->mouth.y <= 18);
+    CHECK_BOOL("MOUTH",         info->mouth.type <= RFLi_MOUTH_TYPE_MAX);
+    CHECK_BOOL("MOUTH",         info->mouth.color <= RFLi_MOUTH_COLOR_MAX);
+    CHECK_BOOL("MOUTH",         info->mouth.scale <= RFLi_MOUTH_SCALE_MAX);
+    CHECK_BOOL("MOUTH",         info->mouth.y <= RFLi_MOUTH_Y_MAX);
 
-    CHECK_BOOL("BEARD",         info->beard.mustache <= 3);
-    CHECK_BOOL("BEARD",         info->beard.type <= 3);
-    CHECK_BOOL("BEARD",         info->beard.color <= 7);
-    CHECK_BOOL("BEARD",         info->beard.scale <= 8);
-    CHECK_BOOL("BEARD",         info->beard.y <= 16);
+    CHECK_BOOL("BEARD",         info->beard.mustache <= RFLi_BEARD_MUSTACHE_MAX);
+    CHECK_BOOL("BEARD",         info->beard.type <= RFLi_BEARD_TYPE_MAX);
+    CHECK_BOOL("BEARD",         info->beard.color <= RFLi_BEARD_COLOR_MAX);
+    CHECK_BOOL("BEARD",         info->beard.scale <= RFLi_BEARD_SCALE_MAX);
+    CHECK_BOOL("BEARD",         info->beard.y <= RFLi_BEARD_Y_MAX);
 
-    CHECK_BOOL("GLASS",         info->glass.type <= 8);
-    CHECK_BOOL("GLASS",         info->glass.color <= 5);
-    CHECK_BOOL("GLASS",         info->glass.scale <= 7);
-    CHECK_BOOL("GLASS",         info->glass.y <= 20);
+    CHECK_BOOL("GLASS",         info->glass.type <= RFLi_GLASS_TYPE_MAX);
+    CHECK_BOOL("GLASS",         info->glass.color <= RFLi_GLASS_COLOR_MAX);
+    CHECK_BOOL("GLASS",         info->glass.scale <= RFLi_GLASS_SCALE_MAX);
+    CHECK_BOOL("GLASS",         info->glass.y <= RFLi_GLASS_Y_MAX);
 
-    CHECK_BOOL("MOLE",          info->mole.type <= 1);
-    CHECK_BOOL("MOLE",          info->mole.scale <= 8);
-    CHECK_BOOL("MOLE",          info->mole.x <= 16);
-    CHECK_BOOL("MOLE",          info->mole.y <= 30);
+    CHECK_BOOL("MOLE",          info->mole.type <= RFLi_MOLE_TYPE_MAX);
+    CHECK_BOOL("MOLE",          info->mole.scale <= RFLi_MOLE_SCALE_MAX);
+    CHECK_BOOL("MOLE",          info->mole.x <= RFLi_MOLE_X_MAX);
+    CHECK_BOOL("MOLE",          info->mole.y <= RFLi_MOLE_Y_MAX);
 
     CHECK_BOOL("NAME",          RFLiIsValidName2(info));
 
-    CHECK_BOOL("HEIGHT",        info->body.height <= 128);
-    CHECK_BOOL("BUILD",         info->body.build <= 128);
+    CHECK_BOOL("HEIGHT",        info->body.height <= RFLi_HEIGHT_MAX);
+    CHECK_BOOL("BUILD",         info->body.build <= RFLi_BUILD_MAX);
 
     CHECK_BOOL("SEX",           info->personal.sex <= RFLSex_All-1);
     CHECK_BOOL("BIRTHDAY",      RFLiCheckBirthday(info->personal.birth_month, info->personal.birth_day));
@@ -82,58 +70,58 @@ BOOL RFLiCheckValidInfo(const RFLiCharInfo* info) {
 }
 #undef CHECK_BOOL
 
-#define CHECK_BOOL(name, var)       if (!(var))          { return FALSE; }
+#define CHECK_BOOL(name, var)   if (!(var)) { return FALSE; }
 BOOL RFLiCheckValidInfoNoName(const RFLiCharInfo* info) {
-    CHECK_BOOL("FACELINE",      info->faceline.type <= 7);
-    CHECK_BOOL("FACELINE",      info->faceline.color <= 5);
-    CHECK_BOOL("FACELINE",      info->faceline.texture <= 11);
+    CHECK_BOOL("FACELINE",      info->faceline.type <= RFLi_FACELINE_TYPE_MAX);
+    CHECK_BOOL("FACELINE",      info->faceline.color <= RFLi_FACELINE_COLOR_MAX);
+    CHECK_BOOL("FACELINE",      info->faceline.texture <= RFLi_FACELINE_TEX_MAX);
 
-    CHECK_BOOL("HAIR",          info->hair.type <= 71);
-    CHECK_BOOL("HAIR",          info->hair.color <= 7);
-    CHECK_BOOL("HAIR",          info->hair.flip <= 1);
+    CHECK_BOOL("HAIR",          info->hair.type <= RFLi_HAIR_TYPE_MAX);
+    CHECK_BOOL("HAIR",          info->hair.color <= RFLi_HAIR_COLOR_MAX);
+    CHECK_BOOL("HAIR",          info->hair.flip <= RFLi_HAIR_FLIP_MAX);
 
-    CHECK_BOOL("EYE",           info->eye.type <= 47);
-    CHECK_BOOL("EYE",           info->eye.color <= 5);
-    CHECK_BOOL("EYE",           info->eye.scale <= 7);
-    CHECK_BOOL("EYE",           info->eye.rotate <= 7);
-    CHECK_BOOL("EYE",           info->eye.x <= 12);
-    CHECK_BOOL("EYE",           info->eye.y <= 18);
+    CHECK_BOOL("EYE",           info->eye.type <= RFLi_EYE_TYPE_MAX);
+    CHECK_BOOL("EYE",           info->eye.color <= RFLi_EYE_COLOR_MAX);
+    CHECK_BOOL("EYE",           info->eye.scale <= RFLi_EYE_SCALE_MAX);
+    CHECK_BOOL("EYE",           info->eye.rotate <= RFLi_EYE_ROT_MAX);
+    CHECK_BOOL("EYE",           info->eye.x <= RFLi_EYE_X_MAX);
+    CHECK_BOOL("EYE",           info->eye.y <= RFLi_EYE_Y_MAX);
 
-    CHECK_BOOL("EYEBROW",       info->eyebrow.type <= 23);
-    CHECK_BOOL("EYEBROW",       info->eyebrow.color <= 7);
-    CHECK_BOOL("EYEBROW",       info->eyebrow.scale <= 8);
-    CHECK_BOOL("EYEBROW",       info->eyebrow.rotate <= 11);
-    CHECK_BOOL("EYEBROW",       info->eyebrow.x <= 12);
-    CHECK_BOOL("EYEBROW",       info->eyebrow.y >= 3);
-    CHECK_BOOL("EYEBROW",       info->eyebrow.y <= 18);
+    CHECK_BOOL("EYEBROW",       info->eyebrow.type <= RFLi_EYEBROW_TYPE_MAX);
+    CHECK_BOOL("EYEBROW",       info->eyebrow.color <= RFLi_EYEBROW_COLOR_MAX);
+    CHECK_BOOL("EYEBROW",       info->eyebrow.scale <= RFLi_EYEBROW_SCALE_MAX);
+    CHECK_BOOL("EYEBROW",       info->eyebrow.rotate <= RFLi_EYEBROW_ROT_MAX);
+    CHECK_BOOL("EYEBROW",       info->eyebrow.x <= RFLi_EYEBROW_X_MAX);
+    CHECK_BOOL("EYEBROW",       info->eyebrow.y >= RFLi_EYEBROW_Y_MIN);
+    CHECK_BOOL("EYEBROW",       info->eyebrow.y <= RFLi_EYEBROW_Y_MAX);
 
-    CHECK_BOOL("NOSE",          info->nose.type <= 11);
-    CHECK_BOOL("NOSE",          info->nose.scale <= 8);
-    CHECK_BOOL("NOSE",          info->nose.y <= 18);
+    CHECK_BOOL("NOSE",          info->nose.type <= RFLi_NOSE_TYPE_MAX);
+    CHECK_BOOL("NOSE",          info->nose.scale <= RFLi_NOSE_SCALE_MAX);
+    CHECK_BOOL("NOSE",          info->nose.y <= RFLi_NOSE_Y_MAX);
 
-    CHECK_BOOL("MOUTH",         info->mouth.type <= 23);
-    CHECK_BOOL("MOUTH",         info->mouth.color <= 2);
-    CHECK_BOOL("MOUTH",         info->mouth.scale <= 8);
-    CHECK_BOOL("MOUTH",         info->mouth.y <= 18);
+    CHECK_BOOL("MOUTH",         info->mouth.type <= RFLi_MOUTH_TYPE_MAX);
+    CHECK_BOOL("MOUTH",         info->mouth.color <= RFLi_MOUTH_COLOR_MAX);
+    CHECK_BOOL("MOUTH",         info->mouth.scale <= RFLi_MOUTH_SCALE_MAX);
+    CHECK_BOOL("MOUTH",         info->mouth.y <= RFLi_MOUTH_Y_MAX);
 
-    CHECK_BOOL("BEARD",         info->beard.mustache <= 3);
-    CHECK_BOOL("BEARD",         info->beard.type <= 3);
-    CHECK_BOOL("BEARD",         info->beard.color <= 7);
-    CHECK_BOOL("BEARD",         info->beard.scale <= 8);
-    CHECK_BOOL("BEARD",         info->beard.y <= 16);
+    CHECK_BOOL("BEARD",         info->beard.mustache <= RFLi_BEARD_MUSTACHE_MAX);
+    CHECK_BOOL("BEARD",         info->beard.type <= RFLi_BEARD_TYPE_MAX);
+    CHECK_BOOL("BEARD",         info->beard.color <= RFLi_BEARD_COLOR_MAX);
+    CHECK_BOOL("BEARD",         info->beard.scale <= RFLi_BEARD_SCALE_MAX);
+    CHECK_BOOL("BEARD",         info->beard.y <= RFLi_BEARD_Y_MAX);
 
-    CHECK_BOOL("GLASS",         info->glass.type <= 8);
-    CHECK_BOOL("GLASS",         info->glass.color <= 5);
-    CHECK_BOOL("GLASS",         info->glass.scale <= 7);
-    CHECK_BOOL("GLASS",         info->glass.y <= 20);
+    CHECK_BOOL("GLASS",         info->glass.type <= RFLi_GLASS_TYPE_MAX);
+    CHECK_BOOL("GLASS",         info->glass.color <= RFLi_GLASS_COLOR_MAX);
+    CHECK_BOOL("GLASS",         info->glass.scale <= RFLi_GLASS_SCALE_MAX);
+    CHECK_BOOL("GLASS",         info->glass.y <= RFLi_GLASS_Y_MAX);
 
-    CHECK_BOOL("MOLE",          info->mole.type <= 1);
-    CHECK_BOOL("MOLE",          info->mole.scale <= 8);
-    CHECK_BOOL("MOLE",          info->mole.x <= 16);
-    CHECK_BOOL("MOLE",          info->mole.y <= 30);
+    CHECK_BOOL("MOLE",          info->mole.type <= RFLi_MOLE_TYPE_MAX);
+    CHECK_BOOL("MOLE",          info->mole.scale <= RFLi_MOLE_SCALE_MAX);
+    CHECK_BOOL("MOLE",          info->mole.x <= RFLi_MOLE_X_MAX);
+    CHECK_BOOL("MOLE",          info->mole.y <= RFLi_MOLE_Y_MAX);
 
-    CHECK_BOOL("HEIGHT",        info->body.height <= 128);
-    CHECK_BOOL("BUILD",         info->body.build <= 128);
+    CHECK_BOOL("HEIGHT",        info->body.height <= RFLi_HEIGHT_MAX);
+    CHECK_BOOL("BUILD",         info->body.build <= RFLi_BUILD_MAX);
 
     CHECK_BOOL("SEX",           info->personal.sex <= RFLSex_All-1);
     CHECK_BOOL("BIRTHDAY",      RFLiCheckBirthday(info->personal.birth_month, info->personal.birth_day));
@@ -295,11 +283,11 @@ static void copyChar2Additional_(RFLAdditionalInfo* dst, const RFLiCharInfo* src
     build = src->body.build;
 
     // @BUG The max is not 127
-    if (height > 128 - 1) {
-        height = 128 - 1;
+    if (height > RFLi_HEIGHT_MAX-1) {
+        height = RFLi_HEIGHT_MAX-1;
     }
-    if (build > 128 - 1) {
-        build = 128 - 1;
+    if (build > RFLi_BUILD_MAX-1) {
+        build = RFLi_BUILD_MAX-1;
     }
 
     dst->height = height;

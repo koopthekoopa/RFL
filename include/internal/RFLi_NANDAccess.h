@@ -12,6 +12,8 @@
 extern "C" {
 #endif
 
+#define RFL_NAND_ACCESS_MAX 2
+
 typedef enum {
     RFLiAsyncTag_WriteFile = 0,
     RFLiAsyncTag_WriteCloseFile,
@@ -52,7 +54,7 @@ typedef struct {
     RFLSimpleCB callback; // 0x0
     union { // inferred
         struct {
-            char filename[65]; // 0x0
+            char filename[NAND_MAX_PATH+1]; // 0x0
             u8 openmode; // 0x41
             u8 permission; // 0x42
             u8 attribute; // 0x43

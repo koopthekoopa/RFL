@@ -184,8 +184,8 @@ typedef struct {
         u8 build; // 0x1
     } body; // 0x16
     struct {
-        u16 name[11]; // 0x0
-        u16 creator[11]; // 0x16
+        u16 name[RFL_NAME_LENGTH+1]; // 0x0
+        u16 creator[RFL_NAME_LENGTH+1]; // 0x16
         u16 sex : 1; // 0x2C
         u16 birth_month : 4; // 0x2C
         u16 birth_day : 5; // 0x2C
@@ -203,10 +203,10 @@ typedef struct {
     u16 birth_day : 5; // 0x0
     u16 favoriteColor : 4; // 0x0
     u16 favorite : 1; // 0x0
-    u16 name[10]; // 0x2
+    u16 name[RFL_NAME_LENGTH]; // 0x2
     u8 height; // 0x16
     u8 build; // 0x17
-    u8 createID[8]; // 0x18
+    u8 createID[RFL_CREATE_ID_LENGTH]; // 0x18
     u16 faceType : 3; // 0x20
     u16 faceColor : 3; // 0x20
     u16 faceTex : 4; // 0x20
@@ -253,7 +253,7 @@ typedef struct {
     u16 moleY : 5; // 0x34
     u16 moleX : 5; // 0x34
     u16 padding8 : 1; // 0x34
-    u16 creatorName[10]; // 0x36
+    u16 creatorName[RFL_NAME_LENGTH]; // 0x36
 } RFLiCharData;
 
 typedef struct {
@@ -267,10 +267,10 @@ typedef struct {
     u16 birth_padding : 9; // 0x0
     u16 favoriteColor : 4; // 0x0
     u16 favorite : 1; // 0x0
-    u16 name[10]; // 0x2
+    u16 name[RFL_NAME_LENGTH]; // 0x2
     u8 height; // 0x16
     u8 build; // 0x17
-    u8 createID[8]; // 0x18
+    u8 createID[RFL_CREATE_ID_LENGTH]; // 0x18
     u16 faceType : 3; // 0x20
     u16 faceColor : 3; // 0x20
     u16 faceTex : 4; // 0x20

@@ -9,7 +9,8 @@
 extern "C" {
 #endif
 
-#define RFL_NAME_LENGTH 10
+#define RFL_NAME_LENGTH         10
+#define RFL_CREATE_ID_LENGTH    8
 
 typedef void (*RFLSimpleCB)();
 typedef void (*RFLSimpleCBArg)(u32);
@@ -112,7 +113,7 @@ typedef enum {
 } RFLRace;
 
 typedef struct {
-    u8  data[8];
+    u8  data[RFL_CREATE_ID_LENGTH];
 } RFLCreateID;
 
 typedef struct {

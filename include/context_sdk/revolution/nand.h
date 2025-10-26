@@ -7,11 +7,13 @@
 extern "C" {
 #endif
 
+#define NAND_MAX_PATH   64
+
 typedef struct NANDFileInfo {
     s32 fileDescriptor; // 0x0
     s32 origFd; // 0x4
-    s8 origPath[64]; // 0x8
-    s8 tmpPath[64]; // 0x48
+    s8 origPath[NAND_MAX_PATH]; // 0x8
+    s8 tmpPath[NAND_MAX_PATH]; // 0x48
     u8 accType; // 0x88
     u8 stage; // 0x89
     u8 mark; // 0x8A
@@ -32,7 +34,7 @@ typedef struct NANDCommandBlock {
     u32 groupAcc; // 0x28
     u32 othersAcc; // 0x2C
     u32 num; // 0x30
-    s8 absPath[64]; // 0x34
+    s8 absPath[NAND_MAX_PATH]; // 0x34
     u32* length; // 0x74
     u32* pos; // 0x78
     int state; // 0x7C
@@ -57,7 +59,7 @@ typedef void (*NANDCallback)(s32 result, NANDCommandBlock* block);
 
 enum {
     NAND_RESULT_FATAL_ERROR = -128,
-    NAND_RESULT_UNKNOWN = -64,
+    NAND_RESULT_UNKNOWN = -NAND_MAX_PATH,
 
     NAND_RESULT_MAXDEPTH = -16,
     NAND_RESULT_AUTHENTICATION,

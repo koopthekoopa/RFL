@@ -14,24 +14,24 @@ typedef struct {
     u8 age; // 0x1
     u8 race; // 0x2
     u8 padding; // 0x3
-} RFL_MIDDLEDB_MASK;
+} RFL_RANDOM_PARAM;
 
 typedef struct {
     s32 sex : 2; // 0x0
     s32 srcIdx : 15; // 0x0
     s32 dstIdx : 15; // 0x0
-} RFL_MIDDLEDB_PARAM;
-
-typedef struct {
-    s16 lastSrcIdx; // 0x0
-    u16 padding; // 0x2
-} RFL_MIDDLEDB_PARAM2;
+} RFL_NEW_OLD_PARAM;
 
 typedef struct {
     u16 dstIdx; // 0x0
     u8 sex; // 0x2
     u8 padding; // 0x3
-} RFL_MIDDLEDB_RAND_PARAM;
+} RFL_HIDDEN_RANDOM_PARAM;
+
+typedef struct {
+    s16 lastSrcIdx; // 0x0
+    u16 padding; // 0x2
+} RFL_DEST_PARAM; // ?
 
 void RFLInitMiddleDB(RFLMiddleDB* db, RFLMiddleDBType type, void* buffer, u16 size) {
     RFLiMiddleDB* idb = (RFLiMiddleDB*)db;
@@ -50,7 +50,7 @@ void RFLInitMiddleDB(RFLMiddleDB* db, RFLMiddleDBType type, void* buffer, u16 si
 
         switch (type) {
             case RFLMiddleDBType_Random: {
-                RFL_MIDDLEDB_MASK* mask = (RFL_MIDDLEDB_MASK*)&idb->userdata1;
+                RFL_RANDOM_PARAM* mask = (RFL_RANDOM_PARAM*)&idb->userdata1;
 
                 RFLi_ASSERTLINE(size <= (100) /*RFL_MAX_DATABASE*/, 106);
                 if (size > RFL_MAX_DATABASE) {
@@ -64,7 +64,7 @@ void RFLInitMiddleDB(RFLMiddleDB* db, RFLMiddleDBType type, void* buffer, u16 si
             }
             case RFLMiddleDBType_HiddenNewer:
             case RFLMiddleDBType_HiddenOlder: {
-                RFL_MIDDLEDB_PARAM* param = (RFL_MIDDLEDB_PARAM*)&idb->userdata1;
+                RFL_NEW_OLD_PARAM* param = (RFL_NEW_OLD_PARAM*)&idb->userdata1;
 
                 RFLi_ASSERTLINE(size <= (10000) /*RFL_MAX_HIDDEN_DB*/, 120);
                 if (size > RFL_MAX_HIDDEN_DB) {
@@ -76,7 +76,7 @@ void RFLInitMiddleDB(RFLMiddleDB* db, RFLMiddleDBType type, void* buffer, u16 si
                 break;
             }
             case RFLMiddleDBType_HiddenRandom: {
-                RFL_MIDDLEDB_RAND_PARAM* param = (RFL_MIDDLEDB_RAND_PARAM*)&idb->userdata1;
+                RFL_HIDDEN_RANDOM_PARAM* param = (RFL_HIDDEN_RANDOM_PARAM*)&idb->userdata1;
 
                 param->sex = RFLSex_All;
                 param->dstIdx = 0;
@@ -108,7 +108,7 @@ static BOOL checkHiddenData_(RFLiHiddenCharData* data) {
 
 static void updateHDBcallback_(u32 arg) {
     RFLiMiddleDB* db = (RFLiMiddleDB*)arg;
-    RFL_MIDDLEDB_PARAM* param = (RFL_MIDDLEDB_PARAM*)&db->userdata1;
+    RFL_NEW_OLD_PARAM* param = (RFL_NEW_OLD_PARAM*)&db->userdata1;
     
     if (RFLGetAsyncStatus() == RFLErrcode_Success || RFLGetAsyncStatus() == RFLErrcode_Broken) {
         s16 src = -1;
@@ -152,7 +152,7 @@ static void updateHDBcallback_(u32 arg) {
 
     if (!RFLiIsWorking()) {
         if (RFLGetAsyncStatus() == RFLErrcode_NANDCommandfail && RFLGetLastReason() == NAND_RESULT_BUSY) {
-            RFL_MIDDLEDB_PARAM2* param2 = (RFL_MIDDLEDB_PARAM2*)&db->userdata2;
+            RFL_DEST_PARAM* param2 = (RFL_DEST_PARAM*)&db->userdata2;
             param->srcIdx = param2->lastSrcIdx;
             db->storedSize = 0;
             param->dstIdx = 0;
@@ -191,7 +191,7 @@ static s16 stepOne_(s16 srcIdx, BOOL oldIsHead) {
 static void loadHiddenDataSync_(RFLiMiddleDB* db) {
     s16 src = -1;
     BOOL running = TRUE;
-    RFL_MIDDLEDB_PARAM* param = (RFL_MIDDLEDB_PARAM*)&db->userdata1;
+    RFL_NEW_OLD_PARAM* param = (RFL_NEW_OLD_PARAM*)&db->userdata1;
 
     while (running) {
         RFLiLoadCachedHiddenData(&db->data[db->storedSize], param->srcIdx);
@@ -220,7 +220,7 @@ static void loadHiddenDataSync_(RFLiMiddleDB* db) {
 }
 
 static void updateHiddenOld_(RFLiMiddleDB* db, BOOL oldIsHead, BOOL use_cache) {
-    RFL_MIDDLEDB_PARAM* param = (RFL_MIDDLEDB_PARAM*)&db->userdata1;
+    RFL_NEW_OLD_PARAM* param = (RFL_NEW_OLD_PARAM*)&db->userdata1;
 
     if (!RFLiDBIsLoaded()) {
         RFLiEndWorking(RFLErrcode_DBNodata);
@@ -265,14 +265,14 @@ static void updateHiddenOld_(RFLiMiddleDB* db, BOOL oldIsHead, BOOL use_cache) {
     }
 }
 
-static void loadHiddenRandomSync_(RFLiMiddleDB* db /* r30 */) {
-    BOOL running = TRUE; // r27
-    RFL_MIDDLEDB_RAND_PARAM* param = (RFL_MIDDLEDB_RAND_PARAM*)&db->userdata1; // r29
+static void loadHiddenRandomSync_(RFLiMiddleDB* db) {
+    BOOL running = TRUE;
+    RFL_HIDDEN_RANDOM_PARAM* param = (RFL_HIDDEN_RANDOM_PARAM*)&db->userdata1;
 
     while (running) {
-        u32 src = *(u32*)&db->data[param->dstIdx]; // r28
+        u32 src = *(u32*)&db->data[param->dstIdx];
         if (src != 0) {
-            u16 srcIdx = src-1; // r26
+            u16 srcIdx = src-1;
             RFLiLoadCachedHiddenData(&db->data[db->storedSize], srcIdx);
 
             if (checkHiddenData_((RFLiHiddenCharData*)&db->data[db->storedSize])) {
@@ -301,7 +301,7 @@ static void loadHiddenRandomSync_(RFLiMiddleDB* db /* r30 */) {
 
 static void updateHDBRandcallback_(u32 arg /* r31+0x8 */) {
     RFLiMiddleDB* db = (RFLiMiddleDB*)arg; // r30
-    RFL_MIDDLEDB_RAND_PARAM* param = (RFL_MIDDLEDB_RAND_PARAM*)&db->userdata1; // r28
+    RFL_HIDDEN_RANDOM_PARAM* param = (RFL_HIDDEN_RANDOM_PARAM*)&db->userdata1; // r28
 
     if (RFLGetAsyncStatus() == RFLErrcode_Success || RFLGetAsyncStatus() == RFLErrcode_Broken) {
         u32* src; // r29
@@ -343,14 +343,14 @@ static void updateHDBRandcallback_(u32 arg /* r31+0x8 */) {
     }
 }
 
-static void updateHiddenRandom_(RFLiMiddleDB* db /* r28 */, BOOL use_cache /* r31+0x8 */) {
-    RFLSex sex = (RFLSex)((RFL_MIDDLEDB_RAND_PARAM*)&db->userdata1)->sex; // r31+0x34
-    u16 count; // r31+0x16
-    u16 max = db->size; // r31+0x14
-    u16* array; // r29
-    u16 aidx; // r31+0x12
-    u16 i; // r30
-    u32 rand = OSGetTick(); // r31+0x30
+static void updateHiddenRandom_(RFLiMiddleDB* db, BOOL use_cache) {
+    RFLSex sex = (RFLSex)((RFL_HIDDEN_RANDOM_PARAM*)&db->userdata1)->sex;
+    u16 count;
+    u16 max = db->size;
+    u16* array;
+    u16 aidx;
+    u16 i;
+    u32 rand = OSGetTick();
 
     RFLiStartWorking();
 
@@ -387,8 +387,8 @@ static void updateHiddenRandom_(RFLiMiddleDB* db /* r28 */, BOOL use_cache /* r3
     RFLi_ASSERTLINE(aidx == count, 514);
 
     for (i = 0; i < (count-1); i++) {
-        u16 tmp; // r31+0x10
-        u16 target; // r31+0xE
+        u16 tmp;
+        u16 target;
 
         target = (((rand >> 0x10) + rand) & 0xFFFF) % (count-1);
         if (target >= i) {
@@ -410,10 +410,10 @@ static void updateHiddenRandom_(RFLiMiddleDB* db /* r28 */, BOOL use_cache /* r3
     RFLiFree(array);
 
     {
-        RFL_MIDDLEDB_RAND_PARAM* param = (RFL_MIDDLEDB_RAND_PARAM*)&db->userdata1; // r31+0x28
-        u16 srcIdx = 0; // r31+0xC
-        u32* src = (u32*)&db->data[param->dstIdx]; // r31+0x24
-        RFLErrcode err; // r31+0x20;
+        RFL_HIDDEN_RANDOM_PARAM* param = (RFL_HIDDEN_RANDOM_PARAM*)&db->userdata1;
+        u16 srcIdx = 0;
+        u32* src = (u32*)&db->data[param->dstIdx];
+        RFLErrcode err;
 
         if (*src == 0) {
             RFLiEndWorking(RFLErrcode_DBNodata);
@@ -433,24 +433,22 @@ static void updateHiddenRandom_(RFLiMiddleDB* db /* r28 */, BOOL use_cache /* r3
     }
 }
 
-
-// Range: 0xFE0 -> 0x10DC
-static void updateRandom_(RFLiMiddleDB* db /* r30 */) {
-    int count = 0; // r26
-    RFL_MIDDLEDB_MASK* mask = (RFL_MIDDLEDB_MASK*)&db->userdata1; // r29
+static void updateRandom_(RFLiMiddleDB* db) {
+    int count = 0;
+    RFL_RANDOM_PARAM* mask = (RFL_RANDOM_PARAM*)&db->userdata1;
 
     RFLiStartWorking();
 
     while (db->storedSize < db->size) {
-        int j; // r28
-        BOOL isSame = FALSE; // r27
-        RFLiCharInfo info; // r31+0x58
+        int j;
+        BOOL isSame = FALSE;
+        RFLiCharInfo info;
 
         RFLi_MakeRandomFace(&info, (RFLSex)mask->sex, (RFLAge)mask->age, (RFLRace)mask->race);
         RFLiSetTemporaryID(&info);
 
         for (j = 0; j < db->storedSize; j++) {
-            RFLiCharInfo info2; // r31+0x8
+            RFLiCharInfo info2;
             RFLiConvertHRaw2Info(&db->data[j], &info2);
             if (RFLiIsSameFaceCore(&info, &info2)) {
                 isSame = TRUE;
@@ -468,23 +466,23 @@ static void updateRandom_(RFLiMiddleDB* db /* r30 */) {
 }
 
 
-static void startUpdateDB_(RFLiMiddleDB* db /* r30 */) {
+static void startUpdateDB_(RFLiMiddleDB* db) {
     db->storedSize = 0;
     memset(db->data, 0, db->size * 64);
 
     switch (db->type) {
         case RFLMiddleDBType_HiddenNewer:
         case RFLMiddleDBType_HiddenOlder: {
-            RFL_MIDDLEDB_PARAM* param = (RFL_MIDDLEDB_PARAM*)&db->userdata1;
-            RFL_MIDDLEDB_PARAM2* param2 = (RFL_MIDDLEDB_PARAM2*)&db->userdata2;
+            RFL_NEW_OLD_PARAM* param = (RFL_NEW_OLD_PARAM*)&db->userdata1;
+            RFL_DEST_PARAM* param2 = (RFL_DEST_PARAM*)&db->userdata2;
 
             param->dstIdx = 0;
             param2->lastSrcIdx = param->srcIdx;
             break;
         }
         case RFLMiddleDBType_HiddenRandom: {
-            RFL_MIDDLEDB_RAND_PARAM* param = (RFL_MIDDLEDB_RAND_PARAM*)&db->userdata1;
-            RFL_MIDDLEDB_PARAM2* param2 = (RFL_MIDDLEDB_PARAM2*)&db->userdata2;
+            RFL_HIDDEN_RANDOM_PARAM* param = (RFL_HIDDEN_RANDOM_PARAM*)&db->userdata1;
+            RFL_DEST_PARAM* param2 = (RFL_DEST_PARAM*)&db->userdata2;
 
             param->dstIdx = 0;
             param2->lastSrcIdx = 0;
@@ -539,8 +537,8 @@ RFLErrcode RFLUpdateMiddleDBAsync(RFLMiddleDB* db) {
     return RFLiUpdateMiddleDBAsync(db, NULL, FALSE);
 }
 
-RFLErrcode RFLiUpdateMiddleDBAsync(RFLMiddleDB* db /* r29 */, RFLSimpleCB cb /* r28 */, BOOL use_cache /* r30 */) {
-    RFLiMiddleDB* idb = (RFLiMiddleDB*)db; // r31
+RFLErrcode RFLiUpdateMiddleDBAsync(RFLMiddleDB* db, RFLSimpleCB cb, BOOL use_cache) {
+    RFLiMiddleDB* idb = (RFLiMiddleDB*)db;
 
     RFLi_ASSERTLINE_NULL(db, 711);
     RFLi_ASSERTLINE(!use_cache || (use_cache && RFLiIsCachedHDB()), 712);
@@ -570,6 +568,9 @@ RFLErrcode RFLiUpdateMiddleDBAsync(RFLMiddleDB* db /* r29 */, RFLSimpleCB cb /* 
             updateRandom_(idb);
             break;
         }
+        default: {
+            break;
+        }
     }
 
     if (!RFLiIsWorking() && idb->callback != NULL) {
@@ -579,24 +580,24 @@ RFLErrcode RFLiUpdateMiddleDBAsync(RFLMiddleDB* db /* r29 */, RFLSimpleCB cb /* 
     return RFLGetAsyncStatus();
 }
 
-RFLMiddleDBType RFLGetMiddleDBType(const RFLMiddleDB* db /* r29 */) {
+RFLMiddleDBType RFLGetMiddleDBType(const RFLMiddleDB* db) {
     RFLi_ASSERTLINE_NULL(db, 755);
     return (RFLMiddleDBType)((RFLiMiddleDB*)db)->type;
 }
 
-u16 RFLGetMiddleDBSize(const RFLMiddleDB* db /* r29 */) {
+u16 RFLGetMiddleDBSize(const RFLMiddleDB* db) {
     RFLi_ASSERTLINE_NULL(db, 772);
     return (u16)((RFLiMiddleDB*)db)->size;
 }
 
-u16 RFLGetMiddleDBStoredSize(const RFLMiddleDB* db /* r29 */) {
+u16 RFLGetMiddleDBStoredSize(const RFLMiddleDB* db) {
     RFLi_ASSERTLINE_NULL(db, 789);
     return (u16)((RFLiMiddleDB*)db)->storedSize;
 }
 
-BOOL RFLiGetCharInfoMiddleDB(RFLiCharInfo* info /* r1+0x8 */, const RFLMiddleDB* db /* r28 */, u16 index /* r26 */) {
-    RFLiHiddenCharData* data; // r30
-    RFLiMiddleDB* idb; // r31
+BOOL RFLiGetCharInfoMiddleDB(RFLiCharInfo* info, const RFLMiddleDB* db, u16 index) {
+    RFLiHiddenCharData* data;
+    RFLiMiddleDB* idb;
 
     RFLi_ASSERTLINE_NULL(db, 811);
 
@@ -622,36 +623,35 @@ BOOL RFLiGetCharInfoMiddleDB(RFLiCharInfo* info /* r1+0x8 */, const RFLMiddleDB*
     return TRUE;
 }
 
-void RFLSetMiddleDBRandomMask(RFLMiddleDB* db /* r28 */, RFLSex sex /* r1+0x8 */, RFLAge age /* r1+0xC */, RFLRace race /* r1+0x10 */) {
-    // Local variables
-    RFL_MIDDLEDB_MASK* ptr; // r31
-    RFLiMiddleDB* idb = (RFLiMiddleDB*)db; // r30
+void RFLSetMiddleDBRandomMask(RFLMiddleDB* db, RFLSex sex, RFLAge age, RFLRace race) {
+    RFL_RANDOM_PARAM* ptr;
+    RFLiMiddleDB* idb = (RFLiMiddleDB*)db;
 
     RFLi_ASSERTLINE(RFLGetMiddleDBType(db) == RFLMiddleDBType_Random, 844);
 
     if (RFLGetMiddleDBType(db) == RFLMiddleDBType_Random) {
-        ptr = (RFL_MIDDLEDB_MASK*)&idb->userdata1;
+        ptr = (RFL_RANDOM_PARAM*)&idb->userdata1;
         ptr->sex = sex;
         ptr->age = age;
         ptr->race = race;
     }
 }
 
-void RFLSetMiddleDBHiddenMask(RFLMiddleDB* db /* r21 */, RFLSex sex /* r22 */) {
-    RFLiMiddleDB* idb = (RFLiMiddleDB*)db; // r29
-    RFLMiddleDBType type = RFLGetMiddleDBType(db); // r30
+void RFLSetMiddleDBHiddenMask(RFLMiddleDB* db, RFLSex sex) {
+    RFLiMiddleDB* idb = (RFLiMiddleDB*)db;
+    RFLMiddleDBType type = RFLGetMiddleDBType(db);
 
     RFLi_ASSERTLINE(type == RFLMiddleDBType_HiddenOlder || type == RFLMiddleDBType_HiddenNewer || type == RFLMiddleDBType_HiddenRandom, 873);
 
     switch (type) {
         case RFLMiddleDBType_HiddenRandom: {
-            RFL_MIDDLEDB_RAND_PARAM* ptr = (RFL_MIDDLEDB_RAND_PARAM*)&idb->userdata1;
+            RFL_HIDDEN_RANDOM_PARAM* ptr = (RFL_HIDDEN_RANDOM_PARAM*)&idb->userdata1;
             ptr->sex = sex;
             break;
         }
         case RFLMiddleDBType_HiddenNewer:
         case RFLMiddleDBType_HiddenOlder: {
-            RFL_MIDDLEDB_PARAM* ptr = (RFL_MIDDLEDB_PARAM*)&idb->userdata1;
+            RFL_NEW_OLD_PARAM* ptr = (RFL_NEW_OLD_PARAM*)&idb->userdata1;
             ptr->sex = (u8)sex;
         }
         default: {
@@ -660,8 +660,6 @@ void RFLSetMiddleDBHiddenMask(RFLMiddleDB* db /* r21 */, RFLSex sex /* r22 */) {
     }
 }
 
-
-// Range: 0x1948 -> 0x1A18
 void RFLiDeleteMiddleDB(RFLMiddleDB* db, u16 index) {
     RFLiHiddenCharData* data;
     RFLiMiddleDB* idb;
@@ -679,15 +677,12 @@ void RFLiDeleteMiddleDB(RFLMiddleDB* db, u16 index) {
     }
 }
 
-
-// Range: 0x1A18 -> 0x1B58
-BOOL RFLiPassMiddleDB(RFLMiddleDB* db /* r24 */, u16 passNum /* r31+0x8 */) {
-    // Local variables
-    BOOL completed = FALSE; // r26
-    int i; // r29
-    RFLiMiddleDB* idb; // r28
-    RFL_MIDDLEDB_PARAM* param; // r27
-    RFLiHiddenDBManager* manager = RFLiGetHDBManager(); // r31+0x10
+BOOL RFLiPassMiddleDB(RFLMiddleDB* db, u16 passNum) {
+    BOOL completed = FALSE;
+    int i;
+    RFLiMiddleDB* idb;
+    RFL_NEW_OLD_PARAM* param;
+    RFLiHiddenDBManager* manager = RFLiGetHDBManager();
 
     RFLi_ASSERTLINE_NULL(db, 942);
 
@@ -696,9 +691,9 @@ BOOL RFLiPassMiddleDB(RFLMiddleDB* db /* r24 */, u16 passNum /* r31+0x8 */) {
     }
 
     idb = (RFLiMiddleDB*)db;
-    param = (RFL_MIDDLEDB_PARAM*)&idb->userdata1;
+    param = (RFL_NEW_OLD_PARAM*)&idb->userdata1;
     for (i = 0; i < passNum; i++) {
-        s16 target = -1; // r30
+        s16 target = -1;
 
         switch (idb->type) {
             case RFLMiddleDBType_HiddenOlder: {
@@ -725,10 +720,10 @@ BOOL RFLiPassMiddleDB(RFLMiddleDB* db /* r24 */, u16 passNum /* r31+0x8 */) {
     return completed;
 }
 
-RFLErrcode RFLiAddMiddleDBUserData(RFLMiddleDB* db /* r26 */, const RFLCharData* data /* r30 */) {
-    RFLiHiddenCharData hdata; // r1+0x8
-    RFLiMiddleDB* idb; // r31
-    RFLiCharInfo info; // r1+0x48
+RFLErrcode RFLiAddMiddleDBUserData(RFLMiddleDB* db, const RFLCharData* data) {
+    RFLiHiddenCharData hdata;
+    RFLiMiddleDB* idb;
+    RFLiCharInfo info;
 
     RFLi_ASSERTLINE_NULL(db, 989);
     RFLi_ASSERTLINE_NULL(data, 990);
@@ -771,7 +766,7 @@ RFLErrcode RFLiAddMiddleDBUserData(RFLMiddleDB* db /* r26 */, const RFLCharData*
     return RFLErrcode_Success;
 }
 
-RFLErrcode RFLAddMiddleDBStoreData(RFLMiddleDB* db /* r25 */, const RFLStoreData* data /* r31 */) {
+RFLErrcode RFLAddMiddleDBStoreData(RFLMiddleDB* db, const RFLStoreData* data) {
     u16 crc;
     const RFLiStoreData* rawdata;
 
@@ -794,6 +789,6 @@ RFLErrcode RFLAddMiddleDBStoreData(RFLMiddleDB* db /* r25 */, const RFLStoreData
         return RFLErrcode_Broken;
     }
 
-    rawdata = (const RFLiStoreData*)data; // r28
+    rawdata = (const RFLiStoreData*)data;
     return RFLiAddMiddleDBUserData(db, (RFLCharData*)rawdata);
 }

@@ -5,13 +5,12 @@ __pycache__/*
 asm/*
 build/*
 lib/*
-orig/*
 obj/*
-tools/*
+*.a
+tools/__pycache__/*
 *.ninja*
 compile_commands.json
 objdiff.json
-*.py
 *.lnk
 *.zip
 *.bat
