@@ -49,7 +49,7 @@ typedef struct {
     RFLSimpleCBArg loadCallback; // 0x2C
     u16 loadIndex; // 0x30
     RFLiHiddenCharData* cachedDB; // 0x34
-    int cached; // 0x38
+    BOOL cached; // 0x38
     RFLiHiddenDBList list; // 0x3C
 } RFLiHiddenDBManager;
 
