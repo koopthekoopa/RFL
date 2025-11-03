@@ -32,20 +32,24 @@ typedef enum {
 } RFLiArcID;
 
 typedef struct {
-    u16 num; // 0x0
-    u16 maxsize; // 0x2
-    u32 offset; // 0x4
+    u16 num; // 0x00
+    u16 maxsize; // 0x02
+    u32 offset; // 0x04
 } RFLiNANDArchive;
 
 typedef struct {
-    RFLiNANDArchive archive[RFLiArcID_Max]; // 0x0
-    u32 mCacheSize; // 0x90
-    void* mCacheBuffer; // 0x94
-    BOOL mCached; // 0x98
-    u16 mVersion; // 0x9C
-    u8* mHeaderBuf1; // 0xA0
-    u8* mHeaderBuf2; // 0xA4
-    u8 mReadCount; // 0xA8
+    RFLiNANDArchive archive[RFLiArcID_Max]; // 0x00
+
+    u32             mCacheSize;             // 0x90
+    void*           mCacheBuffer;           // 0x94
+    BOOL            mCached;                // 0x98
+
+    u16             mVersion;               // 0x9C
+
+    u8*             mHeaderBuf1;            // 0xA0
+    u8*             mHeaderBuf2;            // 0xA4
+
+    u8              mReadCount;             // 0xA8
 } RFLiNANDLoader;
 
 void        RFLiInitLoader();

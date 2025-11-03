@@ -14,9 +14,9 @@ typedef struct OSAlarm OSAlarm;
 typedef void (*OSAlarmHandler)(OSAlarm* alarm, OSContext* context);
 
 struct OSAlarm {
-    OSAlarmHandler handler; // 0x0
-    u32 tag; // 0x4
-    long long fire; // 0x8
+    OSAlarmHandler handler; // 0x00
+    u32 tag; // 0x04
+    long long fire; // 0x08
     struct OSAlarm * prev; // 0x10
     struct OSAlarm * next; // 0x14
     long long period; // 0x18

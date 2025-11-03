@@ -8,9 +8,9 @@ extern "C" {
 #endif
 
 struct OSMutex {
-    OSThreadQueue queue; // 0x0
-    OSThread* thread; // 0x8
-    s32 count; // 0xC
+    OSThreadQueue queue; // 0x00
+    OSThread* thread; // 0x08
+    s32 count; // 0x0C
     OSMutexLink link; // 0x10
 };
 

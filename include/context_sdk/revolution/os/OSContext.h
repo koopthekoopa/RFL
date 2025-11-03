@@ -8,7 +8,7 @@ extern "C" {
 #endif
 
 typedef struct OSContext {
-    u32 gpr[32]; // 0x0
+    u32 gpr[32]; // 0x00
     u32 cr; // 0x80
     u32 lr; // 0x84
     u32 ctr; // 0x88

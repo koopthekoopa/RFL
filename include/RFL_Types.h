@@ -125,18 +125,25 @@ typedef struct {
 } RFLStoreData;
 
 typedef struct {
-    u16 name[RFL_NAME_LENGTH+1]; // 0x0
-    u16 creator[RFL_NAME_LENGTH+1]; // 0x16
-    RFLCreateID createID; // 0x2C
-    u32 gender : 1; // 0x34
-    u32 birth_month : 4; // 0x34
-    u32 birth_day : 5; // 0x34
-    u32 favoriteColor : 4; // 0x34
-    u32 favorite : 1; // 0x34
-    u32 height : 7; // 0x34
-    u32 build : 7; // 0x34
-    u32 reserved : 3; // 0x34
-    GXColor skinColor; // 0x38
+    u16         name[RFL_NAME_LENGTH+1];    // 0x00
+    u16         creator[RFL_NAME_LENGTH+1]; // 0x16
+
+    RFLCreateID createID;                   // 0x2C
+
+    u32         gender : 1;                 // 0x34
+
+    u32         birth_month : 4;            // 0x34
+    u32         birth_day : 5;              // 0x34
+
+    u32         favoriteColor : 4;          // 0x34
+    u32         favorite : 1;               // 0x34
+
+    u32         height : 7;                 // 0x34
+    u32         build : 7;                  // 0x34
+
+    u32         reserved : 3;               // 0x34
+
+    GXColor     skinColor;                  // 0x38
 } RFLAdditionalInfo;
 
 #ifdef __cplusplus

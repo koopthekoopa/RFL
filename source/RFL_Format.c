@@ -7,6 +7,8 @@ const u32 gcRFLDataBaseIdentifier = 'RNOD';
 
 #define RFLi_TEMP_BUFFER_SIZE   0x16960
 
+#define TABLE_STEP  1250
+
 void RFLiClearTableData(RFLiFormatTable* data) {
     memset(data, 0, sizeof(RFLiFormatTable));
     data->next = -1;
@@ -57,14 +59,14 @@ static void formatWriteCallback_() {
             manager->formatIndex = 0;
         }
         else {
-            manager->formatIndex += 1250;
+            manager->formatIndex += TABLE_STEP;
         }
 
         if (manager->formatIndex < RFL_MAX_HIDDEN_DB) {
-            s32 offset = manager->formatIndex * 64;
+            s32 offset = manager->formatIndex * sizeof(RFLiHiddenCharData);
             s32 i;
 
-            for (i = 0; i < 1250; i++) {
+            for (i = 0; i < TABLE_STEP; i++) {
                 memset((RFLiHiddenCharData*)manager->formatTmp+i, 0, sizeof(RFLiHiddenCharData));
             }
 

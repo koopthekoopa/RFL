@@ -39,6 +39,7 @@ static void* allocSys_(u32 size, int alignment) {
     return MEMAllocFromExpHeapEx(RFLiGetManager()->mSystemHeap, size, alignment);
 }
 
+// DEBUG NON MATCH
 RFLErrcode RFLInitResAsync(void* workBuffer, void* resBuffer, u32 resSize, BOOL useDeluxTex) {
     RFLErrcode errcode;
 
@@ -90,7 +91,7 @@ RFLErrcode RFLInitResAsync(void* workBuffer, void* resBuffer, u32 resSize, BOOL 
             // Initialize system heap
             {
                 u32 size = 0x24800;
-                void* buffer = MEMAllocFromExpHeapEx(RFLiGetManager()->mRootHeap, size, 32);
+                void* buffer = MEMAllocFromExpHeapEx(RFLiGetManager()->mRootHeap, size, RFL_BUFFER_ALIGN);
                 RFLiGetManager()->mSystemHeap = MEMCreateExpHeapEx(buffer, size, 1);
                 RFLi_REPORT(" systemHeap: 0x%08x - 0x%08x (%6dByte)\n", (u8*)buffer, ((u8*)buffer + size), size);
             }
@@ -98,7 +99,7 @@ RFLErrcode RFLInitResAsync(void* workBuffer, void* resBuffer, u32 resSize, BOOL 
             // Initialize temporary heap
             {
                 u32 size = MEMGetAllocatableSizeForExpHeap(RFLiGetManager()->mRootHeap);
-                void* buffer = MEMAllocFromExpHeapEx(RFLiGetManager()->mRootHeap, size, 8);
+                void* buffer = MEMAllocFromExpHeapEx(RFLiGetManager()->mRootHeap, size, RFL_ALIGN);
                 RFLiGetManager()->mTmpHeap = MEMCreateExpHeapEx(buffer, size, 1);
                 RFLi_REPORT(" tmpHeap   : 0x%08x - 0x%08x (%6dByte)\n", (u8*)buffer, ((u8*)buffer + size), size);
             }
@@ -218,11 +219,11 @@ static void* allocal_(u32 size, int alignment) {
 }
 
 void* RFLiAlloc(u32 size) {
-    return allocal_(size, 8);
+    return allocal_(size, RFL_ALIGN);
 }
 
 void* RFLiAlloc32(u32 size) {
-    return allocal_(size, 32);
+    return allocal_(size, RFL_BUFFER_ALIGN);
 }
 
 void RFLiFree(void *block)  {

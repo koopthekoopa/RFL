@@ -16,38 +16,41 @@ extern "C" {
 #endif
 
 typedef struct {
-    void* head; // 0x0
-    u32 size; // 0x4
-    u8* current; // 0x8
-    u32 count; // 0xC
-    u16 crc; // 0x10
-    struct OSAlarm alarm; // 0x18
-    RFLSimpleCBArg callback; // 0x48
+    void*           head;       // 0x00
+    u32             size;       // 0x04
+    u8*             current;    // 0x08
+    u32             count;      // 0x0C
+    u16             crc;        // 0x10
+
+    OSAlarm         alarm;      // 0x18
+    RFLSimpleCBArg  callback;   // 0x48
 } RFLiDatabaseCRCInfo;
 
 typedef struct {
-    u32 identifier; // 0x0
-    RFLiCharData rawdata[RFL_MAX_DATABASE]; // 0x4
-    u32 isolation : 1; // 0x1CEC
-    u32 padding1 : 31; // 0x1CEC
-    u8 specialInvite[13]; // 0x1CF0
-    u8 month_nwc24; // 0x1CFD
-    u8 day_nwc24; // 0x1CFE
-    u8 padding2; // 0x1CFF
-    RFLiHiddenDatabase hidden; // 0x1D00
+    u32                 identifier;                 // 0x00
+    RFLiCharData        rawdata[RFL_MAX_DATABASE];  // 0x04
+    u32                 isolation : 1;              // 0x1CEC
+    u32                 padding1 : 31;              // 0x1CEC
+
+    u8                  specialInvite[13];          // 0x1CF0
+    u8                  month_nwc24;                // 0x1CFD
+    u8                  day_nwc24;                  // 0x1CFE
+    u8                  padding2;                   // 0x1CFF
+
+    RFLiHiddenDatabase  hidden;                 // 0x1D00
 } RFLiDatabase;
 
 typedef struct {
-    RFLiDatabase* mDatabase; // 0x0
-    RFLSimpleCB saveCallback; // 0x4
-    RFLSimpleCB formatCallback; // 0x8
-    RFLSimpleCB bootloadCallback; // 0xC
-    RFLiOpenType saveType; // 0x10
+    RFLiDatabase*       mDatabase;          // 0x00
+    RFLSimpleCB         saveCallback;       // 0x04
+    RFLSimpleCB         formatCallback;     // 0x08
+    RFLSimpleCB         bootloadCallback;   // 0x0C
+    RFLiOpenType        saveType;           // 0x10
     union {
-        RFLiCharData mDeleteTrg; // 0x14
-        RFLiCharData mSetTrg; // 0x14
+        RFLiCharData    mDeleteTrg; // 0x14
+        RFLiCharData    mSetTrg;    // 0x14
     };
-    RFLiDatabaseCRCInfo crcInfo; // 0x60
+    RFLiDatabaseCRCInfo crcInfo;            // 0x60
 } RFLiDatabaseManager;
 
 void                RFLiInitDatabase(MEMiHeapHead* sysHeap);

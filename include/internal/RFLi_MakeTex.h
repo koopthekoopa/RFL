@@ -14,26 +14,32 @@ extern "C" {
 #endif
 
 typedef struct {
-    f32 x; // offset 0x0, size 0x4
-    f32 y; // offset 0x4, size 0x4
-    f32 width; // offset 0x8, size 0x4
-    f32 height; // offset 0xC, size 0x4
-    f32 angle; // offset 0x10, size 0x4
-    RFLi_ORIGIN origin; // offset 0x14, size 0x4
-    RFLTexObj ngtobj; // offset 0x18, size 0x28
+    f32         x;      // 0x00
+    f32         y;      // 0x04
+
+    f32         width;  // 0x08
+    f32         height; // 0x0C
+
+    f32         angle;  // 0x10
+    RFLi_ORIGIN origin; // 0x14
+    RFLTexObj   ngtobj; // 0x18
 } RFLiFacePart;
 
 typedef struct {
-    RFLiFacePart eyeR; // offset 0x0, size 0x40
-    RFLiFacePart eyeL; // offset 0x40, size 0x40
-    RFLiFacePart eyebrowR; // offset 0x80, size 0x40
-    RFLiFacePart eyebrowL; // offset 0xC0, size 0x40
-    RFLiFacePart mouth; // offset 0x100, size 0x40
-    RFLiFacePart mustacheR; // offset 0x140, size 0x40
-    RFLiFacePart mustacheL; // offset 0x180, size 0x40
-    RFLiFacePart mole; // offset 0x1C0, size 0x40
+    RFLiFacePart    eyeR;       // 0x00
+    RFLiFacePart    eyeL;       // 0x40
+
+    RFLiFacePart    eyebrowR;   // 0x80
+    RFLiFacePart    eyebrowL;   // 0xC0
+
+    RFLiFacePart    mouth;      // 0x100
+
+    RFLiFacePart    mustacheR;  // 0x140
+    RFLiFacePart    mustacheL;  // 0x180
+    RFLiFacePart    mole;       // 0x1C0
 } RFLiFaceData;
 
+// HMMMMM...
 #ifdef __cplusplus
 #define rf &
 #else

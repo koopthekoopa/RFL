@@ -1,6 +1,8 @@
 #ifndef RFLi_CONFIGURATION_H
 #define RFLi_CONFIGURATION_H
 
+#include <revolution/types.h>
+
 #include <RFL_Types.h>
 #include <internal/RFLi_Types.h>
 
@@ -12,6 +14,9 @@ extern "C" {
 #ifdef DEBUG
 #define RFL_DEBUG
 #endif
+
+#define RFL_ALIGN           8
+#define RFL_BUFFER_ALIGN    DEFAULT_ALIGN /* 32 */
 
 #ifdef __cplusplus
 }

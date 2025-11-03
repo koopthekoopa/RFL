@@ -13,27 +13,27 @@ typedef struct OSThread OSThread;
 typedef struct OSMutex  OSMutex;
 
 typedef struct OSThreadLink {
-    OSThread * next; // 0x0
-    OSThread * prev; // 0x4
+    OSThread * next; // 0x00
+    OSThread * prev; // 0x04
 } OSThreadLink;
 
 typedef struct OSMutexQueue {
-    OSMutex * head; // 0x0
-    OSMutex * tail; // 0x4
+    OSMutex * head; // 0x00
+    OSMutex * tail; // 0x04
 } OSMutexQueue;
 
 typedef struct OSMutexLink {
-    OSMutex * next; // 0x0
-    OSMutex * prev; // 0x4
+    OSMutex * next; // 0x00
+    OSMutex * prev; // 0x04
 } OSMutexLink;
 
 typedef struct OSThreadQueue {
-    OSThread * head; // 0x0
-    OSThread * tail; // 0x4
+    OSThread * head; // 0x00
+    OSThread * tail; // 0x04
 } OSThreadQueue;
 
 struct OSThread {
-    OSContext context; // 0x0
+    OSContext context; // 0x00
     u16 state; // 0x2C8
     u16 attr; // 0x2CA
     long suspend; // 0x2CC

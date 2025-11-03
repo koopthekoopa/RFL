@@ -20,37 +20,45 @@ extern "C" {
 #define RFL_MAX_HIDDEN_DB   (10000)
 
 typedef struct {
-    u32 identifier; // 0x0
-    s16 head; // 0x4
-    s16 tail; // 0x6
-    RFLiFormatTable data[RFL_MAX_HIDDEN_DB]; // 0x8
-    u8 padding[22]; // 0x1D4C8
-    u16 crc; // 0x1D4DE
+    u32             identifier;                 // 0x00
+
+    s16             head;                       // 0x04
+    s16             tail;                       // 0x06
+
+    RFLiFormatTable data[RFL_MAX_HIDDEN_DB];    // 0x08
+    u8              padding[22];                // 0x1D4C8
+
+    u16             crc;                        // 0x1D4DE
 } RFLiHiddenDatabase;
 
 typedef struct {
-    RFLiHiddenCharData data[RFL_MAX_DATABASE]; // 0x0
+    RFLiHiddenCharData data[RFL_MAX_DATABASE]; // 0x00
     u8 num; // 0x1900
     u8 current; // 0x1901
 } RFLiHiddenDBList;
 
 typedef struct {
-    BOOL loaded; // 0x0
-    int readError; // 0x4
-    void* writeTmp; // 0x8
-    s16 writeIndex; // 0xC
-    RFLSimpleCB writeCallback; // 0x10
-    void* formatTmp; // 0x14
-    RFLSimpleCB formatCallback; // 0x18
-    s16 formatIndex; // 0x1C
-    RFLiHiddenCharData* loadDst; // 0x20
-    void* loadTmp; // 0x24
-    u32 loadArg; // 0x28
-    RFLSimpleCBArg loadCallback; // 0x2C
-    u16 loadIndex; // 0x30
-    RFLiHiddenCharData* cachedDB; // 0x34
-    BOOL cached; // 0x38
-    RFLiHiddenDBList list; // 0x3C
+    BOOL                loaded;         // 0x00
+    BOOL                readError;      // 0x04
+
+    void*               writeTmp;       // 0x08
+    s16                 writeIndex;     // 0x0C
+    RFLSimpleCB         writeCallback;  // 0x10
+
+    void*               formatTmp;      // 0x14
+    RFLSimpleCB         formatCallback; // 0x18
+    s16                 formatIndex;    // 0x1C
+
+    RFLiHiddenCharData* loadDst;        // 0x20
+    void*               loadTmp;        // 0x24
+    u32                 loadArg;        // 0x28
+    RFLSimpleCBArg      loadCallback;   // 0x2C
+    u16                 loadIndex;      // 0x30
+
+    RFLiHiddenCharData* cachedDB;       // 0x34
+    BOOL                cached;         // 0x38
+
+    RFLiHiddenDBList    list;           // 0x3C
 } RFLiHiddenDBManager;
 
 void        RFLiInitHiddenDatabase();

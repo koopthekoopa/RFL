@@ -16,11 +16,13 @@ typedef enum {
 } RFLIconBG;
 
 typedef struct {
-    u16 width; // offset 0x0, size 0x2
-    u16 height; // offset 0x2, size 0x2
-    RFLIconBG bgType; // offset 0x4, size 0x4
-    GXColor bgColor; // offset 0x8, size 0x4
-    int drawXluOnly; // offset 0xC, size 0x4
+    u16         width;          // 0x00
+    u16         height;         // 0x02
+
+    RFLIconBG   bgType;         // 0x04
+    GXColor     bgColor;        // 0x08
+
+    BOOL        drawXluOnly;    // 0x0C
 } RFLIconSetting;
 
 RFLErrcode  RFLMakeIcon(void* buf, RFLDataSource source, RFLMiddleDB* middleDB, u16 index, RFLExpression expression, const RFLIconSetting* setting);

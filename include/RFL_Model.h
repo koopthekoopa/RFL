@@ -25,24 +25,31 @@ typedef struct {
 } RFLCharModel;
 
 typedef struct {
-    u8 lightEnable; // offset 0x0, size 0x1
-    u32 lightMask; // offset 0x4, size 0x4
-    GXDiffuseFn diffFn; // offset 0x8, size 0x4
-    GXAttnFn attnFn; // offset 0xC, size 0x4
-    GXColor ambientColor; // offset 0x10, size 0x4
-    u8 zCompLoc; // offset 0x14, size 0x1
+    u8          lightEnable; // 0x00
+    u32         lightMask; // 0x04
+
+    GXDiffuseFn diffFn; // 0x08
+    GXAttnFn    attnFn; // 0x0C
+
+    GXColor     ambientColor; // 0x10
+
+    u8          zCompLoc; // 0x14
 } RFLDrawSetting;
 
 typedef struct {
-    u8 txcGenNum; // offset 0x0, size 0x1
-    GXTexCoordID txcID; // offset 0x4, size 0x4
-    GXTexMapID texMapID; // offset 0x8, size 0x4
-    u8 tevStageNum; // offset 0xC, size 0x1
-    GXTevSwapSel tevSwapTable; // offset 0x10, size 0x4
-    GXTevKColorID tevKColorID; // offset 0x14, size 0x4
-    GXTevRegID tevOutRegID; // offset 0x18, size 0x4
-    GXPosNrmMtx posNrmMtxID; // offset 0x1C, size 0x4
-    u8 reverseCulling; // offset 0x20, size 0x1
+    u8              txcGenNum; // 0x00
+    GXTexCoordID    txcID; // 0x04
+
+    GXTexMapID      texMapID; // 0x08
+
+    u8              tevStageNum; // 0x0C
+    GXTevSwapSel    tevSwapTable; // 0x10
+    GXTevKColorID   tevKColorID; // 0x14
+    GXTevRegID      tevOutRegID; // 0x18
+
+    GXPosNrmMtx     posNrmMtxID; // 0x1C
+
+    u8              reverseCulling; // 0x20
 } RFLDrawCoreSetting;
 
 void            RFLSetCoordinate(RFLCoordinate up, RFLCoordinate front);

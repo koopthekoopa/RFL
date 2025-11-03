@@ -13,7 +13,7 @@ static void initWritableList_() {
 void RFLiInitHiddenDatabase() {
     RFLiHiddenDBManager* manager = RFLiGetHDBManager();
 
-    RFLi_ASSERTLINE(manager != 0L, 69 /* ;) */);
+    RFLi_ASSERTLINE(manager != 0L, 69);
 
     if (manager == NULL) {
         return;
@@ -222,6 +222,7 @@ RFLErrcode RFLiSaveHiddenHeaderAsync(RFLSimpleCB cb) {
     return RFLiOpenAsync(RFLiFileType_Database, NAND_ACCESS_WRITE, saveheaderopencallback_);
 }
 
+// DEBUG NON MATCH
 RFLErrcode RFLiDeleteHiddenData(u16 index /* r28 */) {
     RFLiHiddenDBManager* manager = NULL; // r27
     RFLiHiddenDatabase* table; // r29
@@ -364,7 +365,7 @@ static BOOL checkOneWritableData_(const RFLiHiddenCharData* data /* r31 */) {
     return FALSE;
 }
 
-static int checkListWritableData_(const RFLiCtrlWritableList* list /* r29 */, u8 index /* r30 */, RFLiCharInfo* dst /* r31 */) {
+static int checkListWritableData_(const RFLiCtrlWriteList* list /* r29 */, u8 index /* r30 */, RFLiCharInfo* dst /* r31 */) {
     RFLiCharInfo info; // r1+0x8
 
     if (list->isDelete[index] == TRUE && !RFLiGetCharInfo(&info, index) && !info.personal.localonly) {
@@ -409,7 +410,7 @@ static u8 getCtrlWritableCount_(const RFLiCtrlBuffer* buffer, BOOL isChMode) {
     return count;
 }
 
-static u8 getListWritableCount_(const RFLiCtrlWritableList* list) {
+static u8 getListWritableCount_(const RFLiCtrlWriteList* list) {
     u8 i;
     u8 count = 0;
     RFLiHiddenDBManager* manager = RFLiGetHDBManager();
@@ -520,11 +521,11 @@ static void writeHeader_() {
 static void writeData_(const RFLiHiddenCharData* data);
 
 static void writeCallback_() {
-    BOOL doClose = TRUE; // r28
-    RFLiHiddenDBManager* manager = RFLiGetHDBManager(); // r30
+    BOOL doClose = TRUE;
+    RFLiHiddenDBManager* manager = RFLiGetHDBManager();
     
     if (RFLGetAsyncStatus() == RFLErrcode_Success) {
-        RFLiHiddenDBList* list = &RFLiGetHDBManager()->list; // r29
+        RFLiHiddenDBList* list = &RFLiGetHDBManager()->list;
 
         if (RFLiIsCachedHDB()) {
             memcpy(&manager->cachedDB[manager->writeIndex], manager->writeTmp, sizeof(RFLiHiddenCharData));
@@ -551,6 +552,7 @@ static void writeCallback_() {
     }
 }
 
+// DEBUG NON MATCH
 static void writeData_(const RFLiHiddenCharData* data /* r27 */) {
     RFLiHiddenDBManager* manager = RFLiGetHDBManager(); // r31
     s32 offset = 0; // r29
@@ -578,8 +580,8 @@ static void writeData_(const RFLiHiddenCharData* data /* r27 */) {
 }
 
 static void writeStart_() {
-    RFLiHiddenDBManager* manager = RFLiGetHDBManager(); // r30
-    RFLiHiddenDBList* list = &manager->list; // r31
+    RFLiHiddenDBManager* manager = RFLiGetHDBManager();
+    RFLiHiddenDBList* list = &manager->list;
 
     RFLi_ASSERTLINE(manager->writeTmp == 0L, 1120);
 
@@ -611,8 +613,8 @@ static void writeHeaderStartMulti_() {
     RFLiOpenAsync(RFLiFileType_Database, NAND_ACCESS_WRITE, writeHeader_);
 }
 
-static void initAnyBufferToHiddenDB_(RFLSimpleCB cb /* r1+0x8 */, RFLSimpleCB nextScene /* r30 */) {
-    RFLiHiddenDBManager* manager = NULL; // r31
+static void initAnyBufferToHiddenDB_(RFLSimpleCB cb, RFLSimpleCB nextScene) {
+    RFLiHiddenDBManager* manager = NULL;
 
     manager = RFLiGetHDBManager();
     manager->writeCallback = cb;
@@ -625,7 +627,7 @@ static void initAnyBufferToHiddenDB_(RFLSimpleCB cb /* r1+0x8 */, RFLSimpleCB ne
     }
 }
 
-RFLErrcode RFLiWriteCtrlToHiddenDB(const RFLiCtrlBuffer* buffer /* r1+0x8 */, BOOL isChMode /* r1+0xC */) {
+RFLErrcode RFLiWriteCtrlToHiddenDB(const RFLiCtrlBuffer* buffer, BOOL isChMode) {
     initWritableList_();
 
     if (getCtrlWritableCount_(buffer, isChMode)) {
@@ -653,9 +655,9 @@ static void deleteSaveWroteCallback_() {
     RFLiCloseAsync(RFLiFileType_Database, NULL);
 }
 
-RFLErrcode RFLiDeleteSaveHiddenDataAsync(const RFLiCharData* data /* r28 */) {
-    RFLiHiddenDBManager* manager = NULL; // r30
-    RFLiHiddenDBList* list = NULL; // r31
+RFLErrcode RFLiDeleteSaveHiddenDataAsync(const RFLiCharData* data) {
+    RFLiHiddenDBManager* manager = NULL;
+    RFLiHiddenDBList* list = NULL;
 
     RFLi_ASSERTLINE_NULL(data, 1314);
 
@@ -680,12 +682,11 @@ RFLErrcode RFLiDeleteSaveHiddenDataAsync(const RFLiCharData* data /* r28 */) {
     return RFLGetAsyncStatus();
 }
 
-s16 RFLiSearchHiddenData(const RFLCreateID* id /* r1+0x8 */) {
-    // Local variables
-    s16 i; // r31
-    RFLiHiddenDBManager* manager; // r29
-    RFLiFormatTable* head; // r28
-    s16 target = -1; // r30
+s16 RFLiSearchHiddenData(const RFLCreateID* id) {
+    s16 i;
+    RFLiHiddenDBManager* manager;
+    RFLiFormatTable* head;
+    s16 target = -1;
 
     if (!RFLAvailable()) {
         return -1;
@@ -708,11 +709,11 @@ s16 RFLiSearchHiddenData(const RFLCreateID* id /* r1+0x8 */) {
     return target;
 }
 
-u16 RFLiCountupHiddenDataNum(RFLSex sex /* r1+0x8 */) {
-    RFLiHiddenDBManager* manager; // r29
-    RFLiHiddenDatabase* header; // r28
-    u16 count = 0; // r30
-    u16 i; // r31
+u16 RFLiCountupHiddenDataNum(RFLSex sex) {
+    RFLiHiddenDBManager* manager;
+    RFLiHiddenDatabase* header;
+    u16 count = 0;
+    u16 i;
 
     if (!RFLAvailable()) {
         return 0;
@@ -782,10 +783,10 @@ s16 RFLiGetHiddenPrev(u16 index) {
     return data->prev;
 }
 
-BOOL RFLiIsValidHiddenData(u16 index /* r27 */, RFLSex sex /* r29 */) {
-    RFLiHiddenDBManager* manager; // r30
-    RFLiHiddenDatabase* header; // r31
-    u16 count = 0; // r28
+BOOL RFLiIsValidHiddenData(u16 index, RFLSex sex) {
+    RFLiHiddenDBManager* manager;
+    RFLiHiddenDatabase* header;
+    u16 count = 0;
 
     if (!RFLAvailable()) {
         return FALSE;
@@ -918,12 +919,12 @@ static void openCacheCallback_() {
     }
 }
 
-void RFLiClearCacheHDB(void* cache /* r1+0x8 */) {
+void RFLiClearCacheHDB(void* cache) {
     memset(cache, 0, RFLiGetCacheHDBBufferSize());
 }
 
-RFLErrcode RFLiCacheHDBAsync(void* buffer /* r29 */) {
-    RFLiHiddenDBManager* manager; // r31
+RFLErrcode RFLiCacheHDBAsync(void* buffer) {
+    RFLiHiddenDBManager* manager;
 
     RFLi_ASSERTLINE_NULL(buffer, 1637);
 
@@ -955,8 +956,8 @@ RFLErrcode RFLiCacheHDBAsync(void* buffer /* r29 */) {
     return RFLiOpenAsync(RFLiFileType_Database, NAND_ACCESS_READ, openCacheCallback_);
 }
 
-RFLErrcode RFLiCacheHDB(void* buffer /* r1+0x8 */) {
-    RFLErrcode err = RFLErrcode_Unknown; // r31
+RFLErrcode RFLiCacheHDB(void* buffer) {
+    RFLErrcode err = RFLErrcode_Unknown;
 
     err = RFLiCacheHDBAsync(buffer);
     if (err != RFLErrcode_Busy) {
@@ -967,7 +968,7 @@ RFLErrcode RFLiCacheHDB(void* buffer /* r1+0x8 */) {
 }
 
 RFLErrcode RFLiFreeCacheHDB() {
-    RFLiHiddenDBManager* manager = NULL; // r31
+    RFLiHiddenDBManager* manager = NULL;
 
     if (!RFLAvailable()) {
         return RFLErrcode_NotAvailable;
@@ -993,7 +994,7 @@ RFLErrcode RFLiFreeCacheHDB() {
 }
 
 BOOL RFLiIsCachedHDB() {
-    RFLiHiddenDBManager* manager = NULL; // r31
+    RFLiHiddenDBManager* manager = NULL;
 
     if (!RFLAvailable()) {
         return FALSE;

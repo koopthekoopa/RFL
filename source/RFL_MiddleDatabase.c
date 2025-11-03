@@ -6,32 +6,32 @@
 #include <string.h>
 
 u32 RFLGetMiddleDBBufferSize(u16 size) {
-    return size * 64;
+    return size * sizeof(RFLiHiddenCharData);
 }
 
 typedef struct {
-    u8 sex; // 0x0
-    u8 age; // 0x1
-    u8 race; // 0x2
-    u8 padding; // 0x3
+    u8 sex;         // 0x00
+    u8 age;         // 0x01
+    u8 race;        // 0x02
+    u8 padding;     // 0x03
 } RFL_RANDOM_PARAM;
 
 typedef struct {
-    s32 sex : 2; // 0x0
-    s32 srcIdx : 15; // 0x0
-    s32 dstIdx : 15; // 0x0
+    s32 sex : 2;        // 0x00
+    s32 srcIdx : 15;    // 0x00
+    s32 dstIdx : 15;    // 0x00
 } RFL_NEW_OLD_PARAM;
 
 typedef struct {
-    u16 dstIdx; // 0x0
-    u8 sex; // 0x2
-    u8 padding; // 0x3
+    u16 dstIdx;     // 0x00
+    u8  sex;        // 0x02
+    u8  padding;    // 0x03
 } RFL_HIDDEN_RANDOM_PARAM;
 
 typedef struct {
-    s16 lastSrcIdx; // 0x0
-    u16 padding; // 0x2
-} RFL_DEST_PARAM; // ?
+    s16 lastSrcIdx; // 0x00
+    u16 padding;    // 0x02
+} RFL_DEST_PARAM; // I guess
 
 void RFLInitMiddleDB(RFLMiddleDB* db, RFLMiddleDBType type, void* buffer, u16 size) {
     RFLiMiddleDB* idb = (RFLiMiddleDB*)db;
@@ -299,6 +299,7 @@ static void loadHiddenRandomSync_(RFLiMiddleDB* db) {
     RFLiGetManager()->mLastErrcode = db->storedSize < db->size ? RFLErrcode_DBNodata : RFLErrcode_Success;
 }
 
+// DEBUG NON MATCH
 static void updateHDBRandcallback_(u32 arg /* r31+0x8 */) {
     RFLiMiddleDB* db = (RFLiMiddleDB*)arg; // r30
     RFL_HIDDEN_RANDOM_PARAM* param = (RFL_HIDDEN_RANDOM_PARAM*)&db->userdata1; // r28
@@ -468,7 +469,7 @@ static void updateRandom_(RFLiMiddleDB* db) {
 
 static void startUpdateDB_(RFLiMiddleDB* db) {
     db->storedSize = 0;
-    memset(db->data, 0, db->size * 64);
+    memset(db->data, 0, db->size * sizeof(RFLiHiddenCharData));
 
     switch (db->type) {
         case RFLMiddleDBType_HiddenNewer:

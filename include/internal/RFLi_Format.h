@@ -8,11 +8,12 @@ extern "C" {
 #endif
 
 typedef struct {
-    RFLCreateID createID; // 0x0
-    u16 sex : 1; // 0x8
-    s16 next : 15; // 0x8
-    s16 padding2 : 1; // 0xA
-    s16 prev : 15; // 0xA
+    RFLCreateID createID;       // 0x00
+    u16         sex : 1;        // 0x08
+
+    s16         next : 15;      // 0x08
+    s16         padding2 : 1;   // 0x0A
+    s16         prev : 15;      // 0x0A
 } RFLiFormatTable;
 
 void        RFLiClearTableData(RFLiFormatTable* data);

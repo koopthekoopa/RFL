@@ -31,7 +31,7 @@ void RFLiInitAccessInfo(MEMiHeapHead* heap) {
         RFLiNANDAccessInfo* info = RFLiGetAccInfo(i);
         memset(info, 0, sizeof(RFLiNANDAccessInfo));
 
-        info->safeBuffer = MEMAllocFromExpHeapEx(heap, RFLi_SAFE_BUFFER_SIZE, 32);
+        info->safeBuffer = MEMAllocFromExpHeapEx(heap, RFLi_SAFE_BUFFER_SIZE, RFL_BUFFER_ALIGN);
         RFLi_ASSERTLINE_NULL(info->safeBuffer, 123);
 
         OSCreateAlarm(&info->alarm);
@@ -202,6 +202,7 @@ static void retry_(RFLiFileType type, RFLSimpleCBArg cb, u8 count) {
 
 static void createcallback_(s32 result, NANDCommandBlock* block);
 
+// DEBUG AND RELEASE NON MATCH
 static void opencallback_(s32 result /* r26 */, NANDCommandBlock* block /* r31+0x8 */) {
     RFLiFileType type; // r28
     RFLiNANDAccessInfo* info; // r30
@@ -406,8 +407,8 @@ RFLErrcode RFLiOpenAsync(RFLiFileType type, u8 openmode, RFLSimpleCB cb) {
 
     info->callback = cb;
 
-    strncpy(info->openinfo.filename, filename, 64);
-    info->openinfo.filename[64] = 0;
+    strncpy(info->openinfo.filename, filename, NAND_MAX_PATH);
+    info->openinfo.filename[NAND_MAX_PATH] = 0;
 
     info->openinfo.openmode = (u8)openmode;
     info->openinfo.permission = scFilePermissions[type];
@@ -822,8 +823,8 @@ RFLErrcode RFLiWriteAsync(RFLiFileType type, void* src, u32 size, RFLSimpleCB cb
     NANDFileInfo* fileinfo;
     RFLiNANDAccessInfo* info;
 
-    RFLi_ASSERTLINE_ALIGN(src, 32, 1347);
-    RFLi_ASSERTLINE_ALIGN(size, 32, 1348);
+    RFLi_ASSERTLINE_ALIGN(src, RFL_BUFFER_ALIGN, 1347);
+    RFLi_ASSERTLINE_ALIGN(size, RFL_BUFFER_ALIGN, 1348);
     RFLi_ASSERTLINE_RANGE(type, RFLiFileType_Database, RFLiFileType_Max, 1349);
 
     info = RFLiGetAccInfo(type);

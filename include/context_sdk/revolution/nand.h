@@ -10,9 +10,9 @@ extern "C" {
 #define NAND_MAX_PATH   64
 
 typedef struct NANDFileInfo {
-    s32 fileDescriptor; // 0x0
-    s32 origFd; // 0x4
-    s8 origPath[NAND_MAX_PATH]; // 0x8
+    s32 fileDescriptor; // 0x00
+    s32 origFd; // 0x04
+    s8 origPath[NAND_MAX_PATH]; // 0x08
     s8 tmpPath[NAND_MAX_PATH]; // 0x48
     u8 accType; // 0x88
     u8 stage; // 0x89
@@ -20,10 +20,10 @@ typedef struct NANDFileInfo {
 } NANDFileInfo;
 
 typedef struct NANDCommandBlock {
-    void* userData; // 0x0
-    void* callback; // 0x4
-    void* fileInfo; // 0x8
-    void* bytes; // 0xC
+    void* userData; // 0x00
+    void* callback; // 0x04
+    void* fileInfo; // 0x08
+    void* bytes; // 0x0C
     void* inodes; // 0x10
     void* status; // 0x14
     u32 ownerId; // 0x18

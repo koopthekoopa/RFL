@@ -65,7 +65,7 @@ static void loadResRead2ndcallback_() {
     BOOL doClose = FALSE;
     RFLSimpleCB cb = NULL;
 
-    static const u32 scTmpSize2 = 0x20;
+    static const u32 scTmpSize2 = RFL_BUFFER_ALIGN;
 
     if (RFLGetAsyncStatus() == RFLErrcode_Success) {
         s32* offset = (s32*)loader->mHeaderBuf1;
@@ -122,7 +122,7 @@ static void loadResRead1stcallback_() {
     RFLiNANDLoader* loader = RFLiGetLoader();
     BOOL doClose = FALSE;
 
-    static const u32 scTmpSize2 = 0x20;
+    static const u32 scTmpSize2 = RFL_BUFFER_ALIGN;
 
     if (RFLGetAsyncStatus() == RFLErrcode_Success) {
         s32* offset = (s32*)loader->mHeaderBuf1;
@@ -240,7 +240,7 @@ RFLErrcode RFLiLoadResourceHeaderAsync() {
 }
 
 static u32 getSafetyLength_(NANDFileInfo* info) {
-    u8 buffer[32] ATTRIBUTE_ALIGN(32);
+    u8 buffer[RFL_BUFFER_ALIGN] ATTRIBUTE_ALIGN(RFL_BUFFER_ALIGN);
 
     if (NANDRead(info, buffer, sizeof(buffer)) == (s32)sizeof(buffer)) {
         return *(u16*)&buffer[0];

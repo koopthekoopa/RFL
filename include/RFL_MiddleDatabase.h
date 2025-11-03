@@ -17,7 +17,7 @@ typedef enum {
 } RFLMiddleDBType;
 
 typedef struct {
-    u8 data[24]; // 0x0
+    u8 data[24]; // 0x00
 } RFLMiddleDB;
 
 u32             RFLGetMiddleDBBufferSize(u16 size);
