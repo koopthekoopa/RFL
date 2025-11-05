@@ -10,6 +10,13 @@
 extern "C" {
 #endif
 
+#ifndef KEEP_OLD_NULL
+#ifdef NULL
+#undef NULL
+#endif // NULL
+#define NULL    0L
+#endif // KEEP_OLD_NULL
+
 // Debug build
 #ifdef DEBUG
 #define RFL_DEBUG

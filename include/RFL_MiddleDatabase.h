@@ -18,21 +18,21 @@ typedef enum {
 
 typedef struct {
     u8 data[24]; // 0x00
-} RFLMiddleDB;
+} RFLMiddleDatabase;
 
 u32             RFLGetMiddleDBBufferSize(u16 size);
 
-void            RFLInitMiddleDB(RFLMiddleDB* db, RFLMiddleDBType type, void* buffer, u16 size);
-RFLErrcode      RFLUpdateMiddleDBAsync(RFLMiddleDB* db);
+void            RFLInitMiddleDB(RFLMiddleDatabase* db, RFLMiddleDBType type, void* buffer, u16 size);
+RFLErrcode      RFLUpdateMiddleDBAsync(RFLMiddleDatabase* db);
 
-RFLMiddleDBType RFLGetMiddleDBType(const RFLMiddleDB* db);
-u16             RFLGetMiddleDBSize(const RFLMiddleDB* db);
-u16             RFLGetMiddleDBStoredSize(const RFLMiddleDB* db);
+RFLMiddleDBType RFLGetMiddleDBType(const RFLMiddleDatabase* db);
+u16             RFLGetMiddleDBSize(const RFLMiddleDatabase* db);
+u16             RFLGetMiddleDBStoredSize(const RFLMiddleDatabase* db);
 
-void            RFLSetMiddleDBRandomMask(RFLMiddleDB* db, RFLSex sex, RFLAge age, RFLRace race);
-void            RFLSetMiddleDBHiddenMask(RFLMiddleDB* db, RFLSex sex);
+void            RFLSetMiddleDBRandomMask(RFLMiddleDatabase* db, RFLSex sex, RFLAge age, RFLRace race);
+void            RFLSetMiddleDBHiddenMask(RFLMiddleDatabase* db, RFLSex sex);
 
-RFLErrcode      RFLAddMiddleDBStoreData(RFLMiddleDB* db, const RFLStoreData* data);
+RFLErrcode      RFLAddMiddleDBStoreData(RFLMiddleDatabase* db, const RFLStoreData* data);
 
 #ifdef __cplusplus
 }

@@ -1,5 +1,9 @@
+#include <internal/RFLi_LibConfig.h>
+
 #include <RVLFaceLib.h>
 #include <RVLFaceLibInternal.h>
+
+#include <internal/RFLi_Debug.h>
 
 #include <revolution/os.h>
 
@@ -33,7 +37,7 @@ typedef struct {
     u16 padding;    // 0x02
 } RFL_DEST_PARAM; // I guess
 
-void RFLInitMiddleDB(RFLMiddleDB* db, RFLMiddleDBType type, void* buffer, u16 size) {
+void RFLInitMiddleDB(RFLMiddleDatabase* db, RFLMiddleDBType type, void* buffer, u16 size) {
     RFLiMiddleDB* idb = (RFLiMiddleDB*)db;
 
     RFLi_ASSERTLINE_NULL(db, 87);
@@ -299,13 +303,12 @@ static void loadHiddenRandomSync_(RFLiMiddleDB* db) {
     RFLiGetManager()->mLastErrcode = db->storedSize < db->size ? RFLErrcode_DBNodata : RFLErrcode_Success;
 }
 
-// DEBUG NON MATCH
-static void updateHDBRandcallback_(u32 arg /* r31+0x8 */) {
-    RFLiMiddleDB* db = (RFLiMiddleDB*)arg; // r30
-    RFL_HIDDEN_RANDOM_PARAM* param = (RFL_HIDDEN_RANDOM_PARAM*)&db->userdata1; // r28
+static void updateHDBRandcallback_(u32 arg ) {
+    RFLiMiddleDB* db = (RFLiMiddleDB*)arg;
+    RFL_HIDDEN_RANDOM_PARAM* param = (RFL_HIDDEN_RANDOM_PARAM*)&db->userdata1;
 
     if (RFLGetAsyncStatus() == RFLErrcode_Success || RFLGetAsyncStatus() == RFLErrcode_Broken) {
-        u32* src; // r29
+        u32* src;
 
         if (RFLGetAsyncStatus() != RFLErrcode_Broken && checkHiddenData_(&db->data[db->storedSize])) {
             db->storedSize++;
@@ -315,11 +318,13 @@ static void updateHDBRandcallback_(u32 arg /* r31+0x8 */) {
         src = (u32*)&db->data[param->dstIdx];
 
         if (*src > 0 && param->dstIdx < db->size) {
+            RFLErrcode err;
+
             RFLi_ASSERTLINE_RANGE(*src, 0, RFL_MAX_HIDDEN_DB, 443);
             
             if (*src < RFL_MAX_HIDDEN_DB) {
-                u16 srcIdx = *src-1; // r31+0xC
-                RFLErrcode err = RFLiLoadHiddenDataAsync(&db->data[db->storedSize], srcIdx, updateHDBRandcallback_, (u32)db); // r31+0x1C
+                u16 srcIdx = *src-1;
+                err = RFLiLoadHiddenDataAsync(&db->data[db->storedSize], srcIdx, updateHDBRandcallback_, (u32)db);
 
                 if (err != RFLErrcode_Busy) {
                     RFLiEndWorking(err);
@@ -494,7 +499,7 @@ static void startUpdateDB_(RFLiMiddleDB* db) {
     }
 }
 
-RFLErrcode RFLiUpdateMiddleDB(RFLMiddleDB* db) {
+RFLErrcode RFLiUpdateMiddleDB(RFLMiddleDatabase* db) {
     RFLErrcode errcode = RFLErrcode_Unknown;
     BOOL use_cache = FALSE;
 
@@ -524,7 +529,7 @@ RFLErrcode RFLiUpdateMiddleDB(RFLMiddleDB* db) {
     return RFLWaitAsync();
 }
 
-RFLErrcode RFLUpdateMiddleDBAsync(RFLMiddleDB* db) {
+RFLErrcode RFLUpdateMiddleDBAsync(RFLMiddleDatabase* db) {
     RFLi_ASSERTLINE_NULL(db, 686);
 
     if (db == NULL) {
@@ -538,7 +543,7 @@ RFLErrcode RFLUpdateMiddleDBAsync(RFLMiddleDB* db) {
     return RFLiUpdateMiddleDBAsync(db, NULL, FALSE);
 }
 
-RFLErrcode RFLiUpdateMiddleDBAsync(RFLMiddleDB* db, RFLSimpleCB cb, BOOL use_cache) {
+RFLErrcode RFLiUpdateMiddleDBAsync(RFLMiddleDatabase* db, RFLSimpleCB cb, BOOL use_cache) {
     RFLiMiddleDB* idb = (RFLiMiddleDB*)db;
 
     RFLi_ASSERTLINE_NULL(db, 711);
@@ -581,22 +586,22 @@ RFLErrcode RFLiUpdateMiddleDBAsync(RFLMiddleDB* db, RFLSimpleCB cb, BOOL use_cac
     return RFLGetAsyncStatus();
 }
 
-RFLMiddleDBType RFLGetMiddleDBType(const RFLMiddleDB* db) {
+RFLMiddleDBType RFLGetMiddleDBType(const RFLMiddleDatabase* db) {
     RFLi_ASSERTLINE_NULL(db, 755);
     return (RFLMiddleDBType)((RFLiMiddleDB*)db)->type;
 }
 
-u16 RFLGetMiddleDBSize(const RFLMiddleDB* db) {
+u16 RFLGetMiddleDBSize(const RFLMiddleDatabase* db) {
     RFLi_ASSERTLINE_NULL(db, 772);
     return (u16)((RFLiMiddleDB*)db)->size;
 }
 
-u16 RFLGetMiddleDBStoredSize(const RFLMiddleDB* db) {
+u16 RFLGetMiddleDBStoredSize(const RFLMiddleDatabase* db) {
     RFLi_ASSERTLINE_NULL(db, 789);
     return (u16)((RFLiMiddleDB*)db)->storedSize;
 }
 
-BOOL RFLiGetCharInfoMiddleDB(RFLiCharInfo* info, const RFLMiddleDB* db, u16 index) {
+BOOL RFLiGetCharInfoMiddleDB(RFLiCharInfo* info, const RFLMiddleDatabase* db, u16 index) {
     RFLiHiddenCharData* data;
     RFLiMiddleDB* idb;
 
@@ -624,7 +629,7 @@ BOOL RFLiGetCharInfoMiddleDB(RFLiCharInfo* info, const RFLMiddleDB* db, u16 inde
     return TRUE;
 }
 
-void RFLSetMiddleDBRandomMask(RFLMiddleDB* db, RFLSex sex, RFLAge age, RFLRace race) {
+void RFLSetMiddleDBRandomMask(RFLMiddleDatabase* db, RFLSex sex, RFLAge age, RFLRace race) {
     RFL_RANDOM_PARAM* ptr;
     RFLiMiddleDB* idb = (RFLiMiddleDB*)db;
 
@@ -638,7 +643,7 @@ void RFLSetMiddleDBRandomMask(RFLMiddleDB* db, RFLSex sex, RFLAge age, RFLRace r
     }
 }
 
-void RFLSetMiddleDBHiddenMask(RFLMiddleDB* db, RFLSex sex) {
+void RFLSetMiddleDBHiddenMask(RFLMiddleDatabase* db, RFLSex sex) {
     RFLiMiddleDB* idb = (RFLiMiddleDB*)db;
     RFLMiddleDBType type = RFLGetMiddleDBType(db);
 
@@ -661,7 +666,7 @@ void RFLSetMiddleDBHiddenMask(RFLMiddleDB* db, RFLSex sex) {
     }
 }
 
-void RFLiDeleteMiddleDB(RFLMiddleDB* db, u16 index) {
+void RFLiDeleteMiddleDB(RFLMiddleDatabase* db, u16 index) {
     RFLiHiddenCharData* data;
     RFLiMiddleDB* idb;
 
@@ -678,7 +683,7 @@ void RFLiDeleteMiddleDB(RFLMiddleDB* db, u16 index) {
     }
 }
 
-BOOL RFLiPassMiddleDB(RFLMiddleDB* db, u16 passNum) {
+BOOL RFLiPassMiddleDB(RFLMiddleDatabase* db, u16 passNum) {
     BOOL completed = FALSE;
     int i;
     RFLiMiddleDB* idb;
@@ -721,7 +726,7 @@ BOOL RFLiPassMiddleDB(RFLMiddleDB* db, u16 passNum) {
     return completed;
 }
 
-RFLErrcode RFLiAddMiddleDBUserData(RFLMiddleDB* db, const RFLCharData* data) {
+RFLErrcode RFLiAddMiddleDBUserData(RFLMiddleDatabase* db, const RFLCharData* data) {
     RFLiHiddenCharData hdata;
     RFLiMiddleDB* idb;
     RFLiCharInfo info;
@@ -767,7 +772,7 @@ RFLErrcode RFLiAddMiddleDBUserData(RFLMiddleDB* db, const RFLCharData* data) {
     return RFLErrcode_Success;
 }
 
-RFLErrcode RFLAddMiddleDBStoreData(RFLMiddleDB* db, const RFLStoreData* data) {
+RFLErrcode RFLAddMiddleDBStoreData(RFLMiddleDatabase* db, const RFLStoreData* data) {
     u16 crc;
     const RFLiStoreData* rawdata;
 

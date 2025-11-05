@@ -1,5 +1,9 @@
+#include <internal/RFLi_LibConfig.h>
+
 #include <RVLFaceLib.h>
 #include <RVLFaceLibInternal.h>
+
+#include <internal/RFLi_Debug.h>
 
 #include <revolution/os.h>
 #include <revolution/mem.h>

@@ -1,5 +1,9 @@
+#include <internal/RFLi_LibConfig.h>
+
 #include <RVLFaceLib.h>
 #include <RVLFaceLibInternal.h>
+
+#include <internal/RFLi_Debug.h>
 
 #include <string.h>
 
@@ -165,7 +169,7 @@ BOOL RFLiIsSameFaceCore(const RFLiCharInfo* lhv, const RFLiCharInfo* rhv) {
     #undef PAD_MASK
 }
 
-RFLCheckError RFLIsSameFace(RFLDataSource lhvs, RFLMiddleDB* lhvd, u16 lhvi, RFLDataSource rhvs, RFLMiddleDB* rhvd, u16 rhvi) {
+RFLCheckError RFLIsSameFace(RFLDataSource lhvs, RFLMiddleDatabase* lhvd, u16 lhvi, RFLDataSource rhvs, RFLMiddleDatabase* rhvd, u16 rhvi) {
     RFLiCharInfo linfo;
     RFLiCharInfo rinfo;
 
@@ -185,7 +189,7 @@ RFLCheckError RFLIsSameFace(RFLDataSource lhvs, RFLMiddleDB* lhvd, u16 lhvi, RFL
     }
 }
 
-RFLErrcode RFLiPickupCharInfo(RFLiCharInfo* info, RFLDataSource source, const RFLMiddleDB* middleDB, u16 index) {
+RFLErrcode RFLiPickupCharInfo(RFLiCharInfo* info, RFLDataSource source, const RFLMiddleDatabase* middleDB, u16 index) {
     RFLErrcode err;
 
     RFLi_ASSERTLINE_NULL(info, 290);
@@ -207,28 +211,32 @@ RFLErrcode RFLiPickupCharInfo(RFLiCharInfo* info, RFLDataSource source, const RF
         case RFLDataSource_Controller2:
         case RFLDataSource_Controller3:
         case RFLDataSource_Controller4: {
-            BOOL r;
+            {
+                BOOL r;
 
-            s32 chan = source - RFLDataSource_Controller1;
-            r = RFLiGetControllerData(info, chan, (u8)index, FALSE);
-            if (r) {
-                err = RFLErrcode_Success;
-            }
-            else {
-                err = RFLErrcode_Broken;
+                s32 chan = source - RFLDataSource_Controller1;
+                r = RFLiGetControllerData(info, chan, (u8)index, FALSE);
+                if (r) {
+                    err = RFLErrcode_Success;
+                }
+                else {
+                    err = RFLErrcode_Broken;
+                }
             }
             break;
         }
         case RFLDataSource_Middle: {
-            BOOL r;
-            RFLi_ASSERTLINE_NULL(middleDB, 324);
+            {
+                BOOL r;
+                RFLi_ASSERTLINE_NULL(middleDB, 324);
 
-            r = RFLiGetCharInfoMiddleDB(info, middleDB, index);
-            if (r) {
-                err = RFLErrcode_Success;
-            }
-            else {
-                err = RFLErrcode_Broken;
+                r = RFLiGetCharInfoMiddleDB(info, middleDB, index);
+                if (r) {
+                    err = RFLErrcode_Success;
+                }
+                else {
+                    err = RFLErrcode_Broken;
+                }
             }
             break;
         }
@@ -299,7 +307,7 @@ static void copyChar2Additional_(RFLAdditionalInfo* dst, const RFLiCharInfo* src
     dst->skinColor = RFLiGetFacelineColor(src);
 }
 
-RFLErrcode RFLGetAdditionalInfo(RFLAdditionalInfo* info, RFLDataSource source, RFLMiddleDB* db, u16 index) {
+RFLErrcode RFLGetAdditionalInfo(RFLAdditionalInfo* info, RFLDataSource source, RFLMiddleDatabase* db, u16 index) {
     RFLiCharInfo charInfo;
     RFLErrcode err;
 

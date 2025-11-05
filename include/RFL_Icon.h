@@ -25,7 +25,7 @@ typedef struct {
     BOOL        drawXluOnly;    // 0x0C
 } RFLIconSetting;
 
-RFLErrcode  RFLMakeIcon(void* buf, RFLDataSource source, RFLMiddleDB* middleDB, u16 index, RFLExpression expression, const RFLIconSetting* setting);
+RFLErrcode  RFLMakeIcon(void* buf, RFLDataSource source, RFLMiddleDatabase* middleDB, u16 index, RFLExpression expression, const RFLIconSetting* setting);
 void        RFLSetIconDrawDoneCallback(RFLSimpleCB cb);
 
 #ifdef __cplusplus

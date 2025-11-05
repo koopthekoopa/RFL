@@ -10,12 +10,6 @@
 extern "C" {
 #endif
 
-#ifdef NULL
-#undef NULL
-#endif
-#define NULL 0
-
-
 #ifdef RFL_DEBUG
 
 #define RFLi_REPORT(...)                            OSReport(__VA_ARGS__)

@@ -1,5 +1,5 @@
 Revolution Face Library (March 6 2008)
-=============
+======================================
 
 A work-in-progress decompilation of the Revolution Face Library (rev. March 6 2008). The library is responsible for handling Miis on the Nintendo Wii.  
 

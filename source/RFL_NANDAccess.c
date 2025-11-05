@@ -1,5 +1,9 @@
+#include <internal/RFLi_LibConfig.h>
+
 #include <RVLFaceLib.h>
 #include <RVLFaceLibInternal.h>
+
+#include <internal/RFLi_Debug.h>
 
 #include <revolution/os.h>
 #include <revolution/nand.h>
@@ -102,11 +106,12 @@ static void endWorkingClose_(RFLErrcode errcode) {
     endWorkingCloseReason_(errcode, 0);
 }
 
+// DEBUG NON MATCH
 void RFLiEndWorkingReason(RFLErrcode errcode, s32 reason) {
     BOOL b;
     RFLi_ASSERTLINE(RFLAvailable(), 238);
 
-    switch (RFLiGetManager()->mLastErrcode) {
+    switch ((int)RFLiGetManager()->mLastErrcode) {
         case RFLErrcode_Busy:
         case RFLErrcode_Success: {
             b = OSDisableInterrupts();

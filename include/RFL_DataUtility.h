@@ -16,9 +16,9 @@ typedef enum {
     RFLCheckError_ErrorRight,
 } RFLCheckError;
 
-RFLCheckError   RFLIsSameFace(RFLDataSource lhvs, RFLMiddleDB* lhvd, u16 lhvi, RFLDataSource rhvs, RFLMiddleDB* rhvd, u16 rhvi);
+RFLCheckError   RFLIsSameFace(RFLDataSource lhvs, RFLMiddleDatabase* lhvd, u16 lhvi, RFLDataSource rhvs, RFLMiddleDatabase* rhvd, u16 rhvi);
 
-RFLErrcode      RFLGetAdditionalInfo(RFLAdditionalInfo* info, RFLDataSource source, RFLMiddleDB* db, u16 index);
+RFLErrcode      RFLGetAdditionalInfo(RFLAdditionalInfo* info, RFLDataSource source, RFLMiddleDatabase* db, u16 index);
 
 #ifdef __cplusplus
 }

@@ -17,13 +17,9 @@ BOOL        RFLiCheckValidInfoNoName(const RFLiCharInfo* info);
 BOOL        RFLiIsValidOnNAND(const RFLiCharInfo* info);
 BOOL        RFLiIsSameFaceCore(const RFLiCharInfo* lhv, const RFLiCharInfo* rhv);
 
-RFLErrcode  RFLiPickupCharInfo(RFLiCharInfo* info, RFLDataSource source, const RFLMiddleDB* middleDB, u16 index);
+RFLErrcode  RFLiPickupCharInfo(RFLiCharInfo* info, RFLDataSource source, const RFLMiddleDatabase* middleDB, u16 index);
 
 BOOL        RFLiCheckBirthday(u8 month, u8 day);
-
-#ifdef RFL_DEBUG
-void        RFLiCreateStoreData(RFLiStoreData* store, const RFLiCharInfo* info);
-#endif // RFL_DEBUG
 
 #ifdef __cplusplus
 }

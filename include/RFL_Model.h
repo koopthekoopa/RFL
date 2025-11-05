@@ -56,7 +56,7 @@ void            RFLSetCoordinate(RFLCoordinate up, RFLCoordinate front);
 
 u32             RFLGetModelBufferSize(RFLResolution resolution, u32 expressionFlag);
 
-RFLErrcode      RFLInitCharModel(RFLCharModel* charModel, RFLDataSource source, RFLMiddleDB* middleDB, u16 index, void* bufferPtr, RFLResolution resolution, u32 expressionFlag);
+RFLErrcode      RFLInitCharModel(RFLCharModel* charModel, RFLDataSource source, RFLMiddleDatabase* middleDB, u16 index, void* bufferPtr, RFLResolution resolution, u32 expressionFlag);
 
 void            RFLSetMtx(RFLCharModel* charModel, const Mtx mvMtx);
 void            RFLSetMtxPosNrm(RFLCharModel* charModel, const Mtx posMtx,const Mtx nrmMtx);

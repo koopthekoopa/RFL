@@ -32,9 +32,9 @@ typedef struct {
 } RFLiHiddenDatabase;
 
 typedef struct {
-    RFLiHiddenCharData data[RFL_MAX_DATABASE]; // 0x00
-    u8 num; // 0x1900
-    u8 current; // 0x1901
+    RFLiHiddenCharData data[RFL_MAX_DATABASE];  // 0x00
+    u8 num;                                     // 0x1900
+    u8 current;                                 // 0x1901
 } RFLiHiddenDBList;
 
 typedef struct {

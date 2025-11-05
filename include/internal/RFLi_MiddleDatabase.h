@@ -22,15 +22,15 @@ typedef struct {
     u32                 userdata2; // 0x14
 } RFLiMiddleDB;
 
-RFLErrcode  RFLiUpdateMiddleDB(RFLMiddleDB* db);
-RFLErrcode  RFLiUpdateMiddleDBAsync(RFLMiddleDB* db, RFLSimpleCB cb, BOOL use_cache);
+RFLErrcode  RFLiUpdateMiddleDB(RFLMiddleDatabase* db);
+RFLErrcode  RFLiUpdateMiddleDBAsync(RFLMiddleDatabase* db, RFLSimpleCB cb, BOOL use_cache);
 
-BOOL        RFLiGetCharInfoMiddleDB(RFLiCharInfo* info, const RFLMiddleDB* db, u16 index);
+BOOL        RFLiGetCharInfoMiddleDB(RFLiCharInfo* info, const RFLMiddleDatabase* db, u16 index);
 
-void        RFLiDeleteMiddleDB(RFLMiddleDB* db, u16 index);
-BOOL        RFLiPassMiddleDB(RFLMiddleDB* db, u16 passNum);
+void        RFLiDeleteMiddleDB(RFLMiddleDatabase* db, u16 index);
+BOOL        RFLiPassMiddleDB(RFLMiddleDatabase* db, u16 passNum);
 
-RFLErrcode  RFLiAddMiddleDBUserData(RFLMiddleDB* db, const RFLCharData* data);
+RFLErrcode  RFLiAddMiddleDBUserData(RFLMiddleDatabase* db, const RFLCharData* data);
 
 #ifdef __cplusplus
 }

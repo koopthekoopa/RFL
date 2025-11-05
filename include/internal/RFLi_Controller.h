@@ -65,7 +65,7 @@ typedef struct {
     u16                         mRWLen;                                 // 0x66
     u8                          mRetry;                                 // 0x68
     u8*                         mVerifyBuffer;                          // 0x6C
-    RFLMiddleDB                 mHiddenMDB;                             // 0x70
+    RFLMiddleDatabase           mHiddenMDB;                             // 0x70
 } RFLiCtrlManager;
 
 void        RFLiInitCtrlBuf(MEMiHeapHead* sysHeap);
@@ -78,7 +78,7 @@ BOOL        RFLiFormatControllerData(s32 chan);
 
 BOOL        RFLiSetControllerDataIdx(u16 srcIndex, s32 chan, u8 ctrlIndex);
 BOOL        RFLiSetControllerData(const RFLiCharInfo* src, s32 chan, u8 index);
-BOOL        RFLiGetControllerData(const RFLiCharInfo* dst, s32 chan, u8 index, BOOL hiddenAvailable);
+BOOL        RFLiGetControllerData(RFLiCharInfo* dst, s32 chan, u8 index, BOOL hiddenAvailable);
 
 BOOL        RFLiIsAvailableControllerData(s32 chan, u8 index, RFLiCtrlCheckType type);
 

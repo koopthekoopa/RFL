@@ -1,11 +1,11 @@
+#define KEEP_OLD_NULL
+
+#include <internal/RFLi_LibConfig.h>
+
 #include <RVLFaceLib.h>
 #include <RVLFaceLibInternal.h>
 
-// I hate this
-#ifdef NULL
-#undef NULL
-#endif
-#define NULL (void*)0
+#include <internal/RFLi_Debug.h>
 
 #define DEFAULT_DATA_COUNT  ((int)sizeof(scDefaultData)/sizeof(scDefaultData[0]))
 static const u8 scDefaultData[][sizeof(RFLiCharData)] = {

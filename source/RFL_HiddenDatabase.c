@@ -1,5 +1,9 @@
+#include <internal/RFLi_LibConfig.h>
+
 #include <RVLFaceLib.h>
 #include <RVLFaceLibInternal.h>
+
+#include <internal/RFLi_Debug.h>
 
 #include <string.h>
 
@@ -225,8 +229,8 @@ RFLErrcode RFLiSaveHiddenHeaderAsync(RFLSimpleCB cb) {
 // DEBUG NON MATCH
 RFLErrcode RFLiDeleteHiddenData(u16 index /* r28 */) {
     RFLiHiddenDBManager* manager = NULL; // r27
-    RFLiHiddenDatabase* table; // r29
     RFLiFormatTable* curNode; // r30
+    RFLiHiddenDatabase* table; // r29
 
     RFLi_ASSERTLINE_RANGE(index, 0, RFL_MAX_HIDDEN_DB, 399);
 

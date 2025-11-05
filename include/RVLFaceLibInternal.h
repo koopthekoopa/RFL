@@ -1,11 +1,8 @@
 #ifndef REVOLUTION_FACE_LIBRARY_INTERNAL_H
 #define REVOLUTION_FACE_LIBRARY_INTERNAL_H
 
-#include <internal/RFLi_LibConfig.h>
-
 #include <internal/RFLi_Types.h>
 #include <internal/RFLi_System.h>
-#include <internal/RFLi_Debug.h>
 
 #include <internal/RFLi_DefaultDatabase.h>
 #include <internal/RFLi_MiddleDatabase.h>
