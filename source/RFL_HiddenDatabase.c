@@ -226,11 +226,10 @@ RFLErrcode RFLiSaveHiddenHeaderAsync(RFLSimpleCB cb) {
     return RFLiOpenAsync(RFLiFileType_Database, NAND_ACCESS_WRITE, saveheaderopencallback_);
 }
 
-// DEBUG NON MATCH
-RFLErrcode RFLiDeleteHiddenData(u16 index /* r28 */) {
-    RFLiHiddenDBManager* manager = NULL; // r27
-    RFLiFormatTable* curNode; // r30
-    RFLiHiddenDatabase* table; // r29
+RFLErrcode RFLiDeleteHiddenData(u16 index) {
+    RFLiHiddenDBManager* manager = NULL;
+    RFLiFormatTable* curNode;
+    RFLiHiddenDatabase* table;
 
     RFLi_ASSERTLINE_RANGE(index, 0, RFL_MAX_HIDDEN_DB, 399);
 
@@ -260,11 +259,11 @@ RFLErrcode RFLiDeleteHiddenData(u16 index /* r28 */) {
     table = RFLiGetHiddenHeader();
 
     if (curNode->prev != -1) {
-        RFLiFormatTable* prevNode = &table->data[curNode->prev]; // r26
+        RFLiFormatTable* prevNode = &table->data[curNode->prev];
         prevNode->next = curNode->next;
     }
     if (curNode->next != -1) {
-        RFLiFormatTable* nextNode = &table->data[curNode->next]; // r25
+        RFLiFormatTable* nextNode = &table->data[curNode->next];
         nextNode->prev = curNode->prev;
     }
 
@@ -318,10 +317,10 @@ static void updateOfficialCalcCRCCb_() {
     }
 }
 
-BOOL RFLiUpdateOfficial2DeleteHidden(const RFLCreateID* id /* r1+0x8 */) {
-    RFLErrcode err; // r29
-    s16 index = RFLiSearchHiddenData(id); // r31
-    RFLiHiddenDBManager* manager = NULL; // r30
+BOOL RFLiUpdateOfficial2DeleteHidden(const RFLCreateID* id) {
+    RFLErrcode err;
+    s16 index = RFLiSearchHiddenData(id);
+    RFLiHiddenDBManager* manager = NULL;
 
     if (index == -1) {
         return FALSE;
@@ -343,15 +342,15 @@ BOOL RFLiUpdateOfficial2DeleteHidden(const RFLCreateID* id /* r1+0x8 */) {
     return TRUE;
 }
 
-static BOOL checkCtrlWritableData_(const RFLiCtrlBuffer* buffer /* r28 */, u8 index /* r29 */, BOOL isChMode /* r31+0x8 */) {
-    RFLiCtrlCheckType type = RFLiCtrlCheckType_Both; // r30
+static BOOL checkCtrlWritableData_(const RFLiCtrlBuffer* buffer, u8 index, BOOL isChMode) {
+    RFLiCtrlCheckType type = RFLiCtrlCheckType_Both;
 
     if (isChMode) {
         type = RFLiCtrlCheckType_HiddenOnly;
     }
 
     if (RFLiCheckCtrlBufferCore(buffer, index, type)) {
-        RFLiHiddenCharData data; // r31+0x10
+        RFLiHiddenCharData data;
         RFLiConvertRaw2HRaw(&buffer->mData[index], &data);
 
         if (!data.localonly && !RFLSearchOfficialData((RFLCreateID*)&data.createID, NULL)) {
@@ -362,15 +361,15 @@ static BOOL checkCtrlWritableData_(const RFLiCtrlBuffer* buffer /* r28 */, u8 in
     return FALSE;
 }
 
-static BOOL checkOneWritableData_(const RFLiHiddenCharData* data /* r31 */) {
+static BOOL checkOneWritableData_(const RFLiHiddenCharData* data) {
     if (RFLiIsValidID((RFLCreateID*)&data->createID) && !data->localonly && !RFLSearchOfficialData((RFLCreateID*)&data->createID, NULL)) {
         return TRUE;
     }
     return FALSE;
 }
 
-static int checkListWritableData_(const RFLiCtrlWriteList* list /* r29 */, u8 index /* r30 */, RFLiCharInfo* dst /* r31 */) {
-    RFLiCharInfo info; // r1+0x8
+static int checkListWritableData_(const RFLiCtrlWriteList* list, u8 index, RFLiCharInfo* dst) {
+    RFLiCharInfo info;
 
     if (list->isDelete[index] == TRUE && !RFLiGetCharInfo(&info, index) && !info.personal.localonly) {
         if (dst != NULL) {
@@ -381,8 +380,8 @@ static int checkListWritableData_(const RFLiCtrlWriteList* list /* r29 */, u8 in
     return FALSE;
 }
 
-static void setWritableList_(RFLiHiddenDBList* list /* r31 */, const RFLiHiddenCharData* data /* r22 */) {
-    RFLiHiddenCharData* dst; // r29
+static void setWritableList_(RFLiHiddenDBList* list, const RFLiHiddenCharData* data) {
+    RFLiHiddenCharData* dst;
 
     RFLi_ASSERTLINE_NULL(list, 747);
     RFLi_ASSERTLINE_NULL(data, 748);

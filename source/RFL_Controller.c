@@ -179,8 +179,8 @@ static void readcallback_(s32 chan, s32 result) {
     switch (result) {
         case WPAD_ERR_OK: {
             {
-                RFLiCtrlBuffer* buffer = (RFLiCtrlBuffer*)manager->mTmpReadBuffer; // r29
-                RFLiCtrlBuffer* validbuf = NULL; // r28
+                RFLiCtrlBuffer* buffer = (RFLiCtrlBuffer*)manager->mTmpReadBuffer;
+                RFLiCtrlBuffer* validbuf = NULL;
 
                 if (checkValidate_(buffer)) {
                     clearDeleted_(buffer);

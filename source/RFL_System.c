@@ -59,7 +59,7 @@ RFLErrcode RFLInitResAsync(void* workBuffer, void* resBuffer, u32 resSize, BOOL 
         RFLi_REPORT("---------- RVLFaceLib::RFLInit() --------------\n");
 
         if (RFLiGetManager() == NULL) {
-            // Start to initialize!!!
+            // Start to initialize!
 
             OSRegisterVersion(__RFLVersion);
 
@@ -108,7 +108,7 @@ RFLErrcode RFLInitResAsync(void* workBuffer, void* resBuffer, u32 resSize, BOOL 
                 RFLi_REPORT(" tmpHeap   : 0x%08x - 0x%08x (%6dByte)\n", (u8*)buffer, ((u8*)buffer + size), size);
             }
 
-            // Prepare settings
+            // Prepare manager
             RFLiGetManager()->mLastErrcode = RFLErrcode_Success;
             RFLiGetManager()->mBeforeCloseErr = RFLErrcode_Success;
             RFLiGetManager()->mLastReason = 0;
@@ -116,7 +116,7 @@ RFLErrcode RFLInitResAsync(void* workBuffer, void* resBuffer, u32 resSize, BOOL 
             RFLiGetManager()->mUseDeluxTex = useDeluxTex;
             RFLiGetManager()->mBrokenTypeList = FALSE;
 
-            // Icon & model
+            // Prepare for icon and model
             RFLSetIconDrawDoneCallback(FALSE);
             RFLSetModelDrawDoneCallback(FALSE);
             RFLiSetWorking(FALSE);
@@ -131,11 +131,11 @@ RFLErrcode RFLInitResAsync(void* workBuffer, void* resBuffer, u32 resSize, BOOL 
             // Prepare coordinates
             RFLiSetCoordinateData(&scCoordinate);
 
-            // Completed!!!!
+            // Completed!!
             RFLi_REPORT(" remain    : sys=%8dByte, tmp=%8dByte\n", MEMGetTotalFreeSizeForExpHeap(RFLiGetManager()->mSystemHeap), MEMGetTotalFreeSizeForExpHeap(RFLiGetManager()->mTmpHeap));
             RFLi_REPORT(" initialize finished.\n");
 
-            // Setup cache
+            // Setup cache.
             if (resBuffer != NULL) {
                 RFLiNANDLoader* loader = RFLiGetLoader();
                 loader->mCached = TRUE;
@@ -143,6 +143,7 @@ RFLErrcode RFLInitResAsync(void* workBuffer, void* resBuffer, u32 resSize, BOOL 
                 loader->mCacheBuffer = resBuffer;
             }
 
+            // Load data.
             errcode = RFLiBootLoadAsync();
             if (errcode != RFLErrcode_Busy && errcode != RFLErrcode_Success) {
                 RFLExit();

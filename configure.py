@@ -261,7 +261,7 @@ config.libs = [
             Object(DebugNonMatching,    ReleaseNonMatching, "RFL_Model.c"),
             Object(DebugNonMatching,    ReleaseNonMatching, "RFL_MakeTex.c"),
             Object(DebugNonMatching,    ReleaseNonMatching, "RFL_Icon.c"),
-            Object(DebugMatching,       ReleaseMatching,    "RFL_HiddenDatabase.c"),
+            Object(DebugEquivalent,     ReleaseMatching,    "RFL_HiddenDatabase.c"),
             Object(DebugNonMatching,    ReleaseNonMatching, "RFL_Database.c"),
             Object(DebugMatching,       ReleaseMatching,    "RFL_Controller.c"),
             Object(DebugMatching,       ReleaseMatching,    "RFL_MiddleDatabase.c"),
