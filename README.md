@@ -1,5 +1,5 @@
-Revolution Face Library (March 6 2008)
-======================================
+Revolution Face Library
+=======================
 
 A work-in-progress decompilation of the Revolution Face Library (rev. March 6 2008). The library is responsible for handling Miis on the Nintendo Wii.  
 
@@ -93,7 +93,8 @@ Download the latest release from [encounter/objdiff](https://github.com/encounte
 
 Select an object from the left sidebar to begin diffing. Changes to the project will rebuild automatically: changes to source files, headers, or `configure.py`.
 
-Resources used
---------------
+Credits
+-------
 [doldecomp/dolsdk2004](https://www.github.com/doldecomp/dolsdk2004)  
 [kiwi515/ogws](https://www.github.com/kiwi515/ogws)  
+[doldecomp/sdk_2009-12-11](https://www.github.com/doldecomp/sdk_2009-12-11)  
