@@ -17,7 +17,7 @@ static void initWritableList_() {
 void RFLiInitHiddenDatabase() {
     RFLiHiddenDBManager* manager = RFLiGetHDBManager();
 
-    RFLi_ASSERTLINE(manager != 0L, 69);
+    RFLi_ASSERTLINE(manager != 0L /* NULL */, 69);
 
     if (manager == NULL) {
         return;
@@ -75,7 +75,7 @@ void loadopencallback_() {
         s32 offset = manager->loadIndex * sizeof(RFLiHiddenCharData);
         u32 size = sizeof(RFLiHiddenCharData);
 
-        RFLi_ASSERTLINE(manager->loadTmp == 0L, 166);
+        RFLi_ASSERTLINE(manager->loadTmp == 0L /* NULL */, 166);
 
         manager->loadTmp = RFLiAlloc32(size);
 
@@ -123,7 +123,7 @@ RFLErrcode RFLiLoadHiddenDataAsync(RFLiHiddenCharData* data, u16 index, RFLSimpl
         return RFLErrcode_NotAvailable;
     }
 
-    RFLi_ASSERTLINE(manager->loadTmp == 0L, 216);
+    RFLi_ASSERTLINE(manager->loadTmp == 0L /* NULL */, 216);
 
     manager->loadDst = data;
     manager->loadIndex = index;
@@ -586,7 +586,7 @@ static void writeStart_() {
     RFLiHiddenDBManager* manager = RFLiGetHDBManager();
     RFLiHiddenDBList* list = &manager->list;
 
-    RFLi_ASSERTLINE(manager->writeTmp == 0L, 1120);
+    RFLi_ASSERTLINE(manager->writeTmp == 0L /* NULL */, 1120);
 
     if (list->current < list->num) {
         manager->writeTmp = RFLiAlloc32(sizeof(RFLiHiddenCharData));

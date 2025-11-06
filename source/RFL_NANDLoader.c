@@ -138,7 +138,7 @@ static void loadResRead1stcallback_() {
 
         offset++;
 
-        RFLi_ASSERTLINE(loader->mHeaderBuf2 == 0L, 213);
+        RFLi_ASSERTLINE(loader->mHeaderBuf2 == 0L /* NULL */, 213);
 
         loader->mHeaderBuf2 = RFLiAlloc32(scTmpSize2);
         loader->mReadCount = 0;
@@ -178,7 +178,7 @@ static void loadResGetlengthcallback_() {
         static const u32 scTmpSize1 = 0x100;
 
         if (RFLGetAsyncStatus() == RFLErrcode_Success) {
-            RFLi_ASSERTLINE(loader->mHeaderBuf1 == 0L, 261);
+            RFLi_ASSERTLINE(loader->mHeaderBuf1 == 0L /* NULL */, 261);
 
             loader->mHeaderBuf1 = RFLiAlloc32(scTmpSize1);
 
@@ -231,8 +231,8 @@ RFLErrcode RFLiLoadResourceHeaderAsync() {
         return RFLErrcode_Fatal;
     }
 
-    RFLi_ASSERTLINE(loader->mHeaderBuf1 == 0L, 327);
-    RFLi_ASSERTLINE(loader->mHeaderBuf2 == 0L, 328);
+    RFLi_ASSERTLINE(loader->mHeaderBuf1 == 0L /* NULL */, 327);
+    RFLi_ASSERTLINE(loader->mHeaderBuf2 == 0L /* NULL */, 328);
 
     if (RFLIsResourceCached()) {
         parseOnmemoryRes_();

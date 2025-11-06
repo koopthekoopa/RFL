@@ -113,7 +113,7 @@ static void formatOpenCallback_() {
     if (err == RFLErrcode_Success) {
         RFLiHiddenDBManager* manager = RFLiGetHDBManager();
         manager->formatIndex = -1;
-        RFLi_ASSERTLINE(manager->formatTmp == 0L, 197);
+        RFLi_ASSERTLINE(manager->formatTmp == 0L /* NULL */, 197);
         
         manager->formatTmp = RFLiAlloc32(RFLi_TEMP_BUFFER_SIZE);
         RFLiCreateHeaderCRCAsync(formatCalcCRCCb_);

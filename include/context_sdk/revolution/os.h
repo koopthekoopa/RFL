@@ -52,6 +52,7 @@ u32     __OSCoreClock                   ADDRESS(OS_BASE_CACHED + 0x00FC);
 #define OSSleepNanoseconds(ns)          OSSleepTicks(OSNanosecondsToTicks((OSTime)ns))
 
 u32 OSGetTick();
+s64 OSGetTime();
 
 #ifdef __cplusplus
 }

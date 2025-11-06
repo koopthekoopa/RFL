@@ -18,34 +18,36 @@
 extern "C" {
 #endif
 
+#define RFL_MAC_ADDR_LENGTH 6
+
 typedef struct {
-    void*               mWorkBuffer;                // 0x00
+    void*               mWorkBuffer;                    // 0x00
 
-    MEMiHeapHead*       mRootHeap;                  // 0x04
-    MEMiHeapHead*       mSystemHeap;                // 0x08
-    MEMiHeapHead*       mTmpHeap;                   // 0x0C
+    MEMiHeapHead*       mRootHeap;                      // 0x04
+    MEMiHeapHead*       mSystemHeap;                    // 0x08
+    MEMiHeapHead*       mTmpHeap;                       // 0x0C
 
-    RFLiDatabaseManager mDBMan;                     // 0x10
-    RFLiNANDLoader      mLoader;                    // 0xC0
-    RFLiHiddenDBManager mHDBMan;                    // 0x16C
-    RFLiCtrlManager     mCtrlMan;                   // 0x1AAC
+    RFLiDatabaseManager mDBMan;                         // 0x10
+    RFLiNANDLoader      mLoader;                        // 0xC0
+    RFLiHiddenDBManager mHDBMan;                        // 0x16C
+    RFLiCtrlManager     mCtrlMan;                       // 0x1AAC
 
-    BOOL                mIsWorking;                 // 0x1B34
-    BOOL                mUseDeluxTex;               // 0x1B38
+    BOOL                mIsWorking;                     // 0x1B34
+    BOOL                mUseDeluxTex;                   // 0x1B38
 
-    u8                  mBrokenTypeList;            // 0x1B3C
-    RFLErrcode          mLastErrcode;               // 0x1B40
-    RFLErrcode          mBeforeCloseErr;            // 0x1B44
-    s32                 mLastReason;                // 0x1B48
-    s32                 mBeforeCloseReason;         // 0x1B4C
+    u8                  mBrokenTypeList;                // 0x1B3C
+    RFLErrcode          mLastErrcode;                   // 0x1B40
+    RFLErrcode          mBeforeCloseErr;                // 0x1B44
+    s32                 mLastReason;                    // 0x1B48
+    s32                 mBeforeCloseReason;             // 0x1B4C
 
-    RFLiNANDAccessInfo  mAccInfo[RFLiFileType_Max]; // 0x1B50
+    RFLiNANDAccessInfo  mAccInfo[RFLiFileType_Max];     // 0x1B50
 
-    RFLSimpleCB         mSysCB;                     // 0x1F10
-    RFLSimpleCB         mDrawIconCB;                // 0x1F14
-    RFLSimpleCB         mCreateModelCB;             // 0x1F18
+    RFLSimpleCB         mSysCB;                         // 0x1F10
+    RFLSimpleCB         mDrawIconCB;                    // 0x1F14
+    RFLSimpleCB         mCreateModelCB;                 // 0x1F18
 
-    u8                  macaddr[6];                 // 0x1F1C
+    u8                  macaddr[RFL_MAC_ADDR_LENGTH];   // 0x1F1C
 } RFLiSysManager;
 
 RFLErrcode              RFLiBootLoad();

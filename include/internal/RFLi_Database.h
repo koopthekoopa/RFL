@@ -37,7 +37,7 @@ typedef struct {
     u8                  day_nwc24;                  // 0x1CFE
     u8                  padding2;                   // 0x1CFF
 
-    RFLiHiddenDatabase  hidden;                 // 0x1D00
+    RFLiHiddenDatabase  hidden;                     // 0x1D00
 } RFLiDatabase;
 
 typedef struct {
@@ -69,10 +69,10 @@ void                RFLiConvertInfo2Raw(const RFLiCharInfo* info, RFLiCharData* 
 void                RFLiConvertInfo2HRaw(const RFLiCharInfo* info, RFLiHiddenCharData* data);
 void                RFLiConvertHRaw2Raw(const RFLiHiddenCharData* hdata, RFLiCharData* data);
 void                RFLiConvertRaw2HRaw(const RFLiCharData* data, RFLiHiddenCharData* hdata);
-RFLErrcode          RFLiGetCharRawData(const RFLiCharData* data, u16 index);
+RFLErrcode          RFLiGetCharRawData(RFLiCharData* data, u16 index);
 
 RFLErrcode          RFLiGetCharInfo(RFLiCharInfo* info, u16 index);
-RFLErrcode          RFLiSetCharInfo(const RFLiCharInfo* info, u16 index);
+BOOL                RFLiSetCharInfo(const RFLiCharInfo* info, u16 index);
 
 BOOL                RFLiSetAndSaveCharInfoAsync(const RFLiCharInfo* info, u16 index);
 BOOL                RFLiDeleteCharForCtrlMode(u16 index);
@@ -94,15 +94,19 @@ BOOL                RFLiIsValidName(const RFLiCharData* data);
 BOOL                RFLiIsValidName2(const RFLiCharInfo* data);
 
 BOOL                RFLiGetIsolation();
-BOOL                RFLiSetIsolation(BOOL isolation);
+void                RFLiSetIsolation(BOOL isolation);
 
 RFLiHiddenDatabase* RFLiGetHiddenHeader();
 
 BOOL                RFLiDBIsLoaded();
 
 u16                 RFLiCalculateCRC(void* head, u32 size);
+
 void                RFLiCreateHeaderCRC();
 void                RFLiCreateHeaderCRCAsync(RFLSimpleCB cb);
+
+BOOL                RFLiCheckHeaderCRC();
+void                RFLiCheckHeaderCRCAsync(RFLSimpleCBArg cb);
 
 #ifdef __cplusplus
 }

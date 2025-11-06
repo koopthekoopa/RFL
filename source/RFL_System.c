@@ -345,7 +345,7 @@ BOOL RFLiSetMacAddr(const u8* addr) {
     if (!RFLAvailable()) {
         return FALSE;
     }
-    memcpy(RFLiGetManager()->macaddr, addr, 6);
+    memcpy(RFLiGetManager()->macaddr, addr, RFL_MAC_ADDR_LENGTH);
     return TRUE;
 }
 
@@ -371,7 +371,7 @@ BOOL RFLiNotFoundError() {
     if (RFLAvailable()) {
         list = &RFLiGetManager()->mBrokenTypeList;
     }
-    return (*list & (1 << RFLiFileBrokenType_DBNotFound)) ? TRUE : FALSE;
+    return ((*list & (1 << RFLiFileBrokenType_DBNotFound)) != 0) ? TRUE : FALSE;
 }
 
 BOOL RFLiNeedRepairError() {
@@ -381,7 +381,7 @@ BOOL RFLiNeedRepairError() {
         list = &RFLiGetManager()->mBrokenTypeList;
     }
 
-    return (*list & (1 << RFLiFileBrokenType_DBBroken)) ? TRUE : FALSE;
+    return ((*list & (1 << RFLiFileBrokenType_DBBroken)) != 0) ? TRUE : FALSE;
 }
 
 BOOL RFLiCriticalError() {
@@ -392,7 +392,7 @@ BOOL RFLiCriticalError() {
         list = &RFLiGetManager()->mBrokenTypeList;
     }
 
-    return (*list & (1 << RFLiFileBrokenType_ResBroken)) || (*list & (1 << RFLiFileBrokenType_Corrupt)) ? TRUE : FALSE;
+    return ((*list & (1 << RFLiFileBrokenType_ResBroken)) != 0) || (*list & (1 << RFLiFileBrokenType_Corrupt)) ? TRUE : FALSE;
 }
 
 char* RFLGetArcFilePath() {

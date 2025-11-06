@@ -61,12 +61,12 @@ BOOL RFLiCheckCtrlBufferCore(const RFLiCtrlBuffer* buffer, u8 index, RFLiCtrlChe
     u16 flag = (1 << index);
 
     if (type == RFLiCtrlCheckType_OfficialOnly) {
-        if ((buffer->mSecretFlag & flag)) {
+        if ((buffer->mSecretFlag & flag) != 0) {
             return FALSE;
         }
     }
     else if (type == RFLiCtrlCheckType_HiddenOnly) {
-        if (!(buffer->mSecretFlag & flag)) {
+        if ((buffer->mSecretFlag & flag) == 0) {
             return FALSE;
         }
     }
@@ -166,7 +166,7 @@ static void clearDeleted_(RFLiCtrlBuffer* buffer) {
 
     for (i = 0; i < RFL_MAX_CTRL_BUFFER; i++) {
         u16 flag = 1 << i;
-        if (buffer->mDeleted & flag) {
+        if ((buffer->mDeleted & flag) != 0) {
             memset(&buffer->mData[i], 0, sizeof(RFLiCharData));
         }
     }
@@ -605,7 +605,7 @@ static void fillHiddenData_(RFLiCtrlBuffer* buffer) {
     for (i = 0; i < RFL_MAX_CTRL_BUFFER; i++) {
         u16 flag = (1 << i);
 
-        if (!RFLiIsValidID((RFLCreateID*)&buffer->mData[i].createID) || (buffer->mSecretFlag & flag)) {
+        if (!RFLiIsValidID((RFLCreateID*)&buffer->mData[i].createID) || (buffer->mSecretFlag & flag) != 0) {
             memset(&buffer->mData[i], 0, sizeof(RFLiCharData));
             blankSlot |= flag;
         }
@@ -615,7 +615,7 @@ static void fillHiddenData_(RFLiCtrlBuffer* buffer) {
         for (i = 0; i < RFL_MAX_CTRL_BUFFER; i++) {
             RFLiCharInfo info;
 
-            if ((blankSlot & (1 << i))) {
+            if ((blankSlot & (1 << i)) != 0) {
                 if (!RFLiGetCharInfoMiddleDB(&info, db, dbidx)) {
                     break;
                 }
@@ -809,7 +809,7 @@ int RFLiGetControllerData(RFLiCharInfo* dst, s32 chan, u8 index, BOOL hiddenAvai
         return FALSE;
     }
 
-    if (!hiddenAvailable && (buffer->mSecretFlag & flag)) {
+    if (!hiddenAvailable && (buffer->mSecretFlag & flag) != 0) {
         return FALSE;
     }
 
