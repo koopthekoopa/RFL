@@ -10,6 +10,7 @@ extern "C" {
 #include <revolution/os/OSInterrupt.h>
 #include <revolution/os/OSAlarm.h>
 #include <revolution/os/OSContext.h>
+#include <revolution/os/OSCache.h>
 #include <revolution/os/OSMutex.h>
 #include <revolution/os/OSThread.h>
 

@@ -40,13 +40,8 @@ typedef struct {
 } RFLiFaceData;
 
 // HMMMMM...
-#ifdef __cplusplus
-#define rf &
-#else
-#define rf
-#endif
-void            RFLiSetupCopyTex(GXTexFmt texFmt, u16 width, u16 height, void* buf, GXColor rf clearColor);
-#undef rf
+
+void            RFLiSetupCopyTex(GXTexFmt texFmt, u16 width, u16 height, void* buf, GXColor clearColor);
 
 void            RFLiMakeTexture(const RFLiCharInfo* pCharInfo, u8** texBuffer, RFLResolution resolution);
 

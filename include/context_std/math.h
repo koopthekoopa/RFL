@@ -1,8 +1,6 @@
 #ifndef MSL_MATH_H
 #define MSL_MATH_H
 
-#include <internal/math_api.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif

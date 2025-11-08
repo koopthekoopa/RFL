@@ -37,35 +37,35 @@ typedef struct {
 
 typedef struct {
     u8  isDelete[RFL_MAX_DATABASE]; // 0x00
-} RFLiCtrlWriteList;
+} RFLiCtrlWriteDeleteList;
 
 typedef struct {
-    RFLiCtrlBuffer*             mBuffer[WPAD_MAX_CONTROLLERS];          // 0x00
-    BOOL                        mIsLoaded[WPAD_MAX_CONTROLLERS];        // 0x10
-    RFLiCtrlBuffer*             mReplaceBuf[RFL_MAX_REPLACE_BUFFER];    // 0x20
+    RFLiCtrlBuffer*                 mBuffer[WPAD_MAX_CONTROLLERS];          // 0x00
+    BOOL                            mIsLoaded[WPAD_MAX_CONTROLLERS];        // 0x10
+    RFLiCtrlBuffer*                 mReplaceBuf[RFL_MAX_REPLACE_BUFFER];    // 0x20
 
-    BOOL                        mIsRead;                                // 0x28
-    CARDFileInfo                mFile;                                  // 0x2C
+    BOOL                            mIsRead;                                // 0x28
+    CARDFileInfo                    mFile;                                  // 0x2C
 
-    void*                       mTmpReadBuffer;                         // 0x40
-    void*                       mReadBuffer;                            // 0x44
+    void*                           mTmpReadBuffer;                         // 0x40
+    void*                           mReadBuffer;                            // 0x44
 
-    void*                       mWriteBuffer;                           // 0x48
-    u16                         mWriteSize;                             // 0x4C
-    u16                         mWriteOffset;                           // 0x4E
+    void*                           mWriteBuffer;                           // 0x48
+    u16                             mWriteSize;                             // 0x4C
+    u16                             mWriteOffset;                           // 0x4E
 
-    u16                         mDeleted;                               // 0x50
-    s32                         mWriteChannel;                          // 0x54
-    const RFLiCtrlWriteList*    mWriteDeleteList;                       // 0x58
+    u16                             mDeleted;                               // 0x50
+    s32                             mWriteChannel;                          // 0x54
+    const RFLiCtrlWriteDeleteList*  mWriteDeleteList;                       // 0x58
 
-    u16                         mReadSize;                              // 0x5C
-    u16                         mCurrentPos;                            // 0x5E
-    BOOL                        mReadIsChMode;                          // 0x60
-    u8                          mWriteCount;                            // 0x64
-    u16                         mRWLen;                                 // 0x66
-    u8                          mRetry;                                 // 0x68
-    u8*                         mVerifyBuffer;                          // 0x6C
-    RFLMiddleDatabase           mHiddenMDB;                             // 0x70
+    u16                             mReadSize;                              // 0x5C
+    u16                             mCurrentPos;                            // 0x5E
+    BOOL                            mReadIsChMode;                          // 0x60
+    u8                              mWriteCount;                            // 0x64
+    u16                             mRWLen;                                 // 0x66
+    u8                              mRetry;                                 // 0x68
+    u8*                             mVerifyBuffer;                          // 0x6C
+    RFLMiddleDatabase               mHiddenMDB;                             // 0x70
 } RFLiCtrlManager;
 
 void        RFLiInitCtrlBuf(MEMiHeapHead* sysHeap);

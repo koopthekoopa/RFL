@@ -368,7 +368,7 @@ static BOOL checkOneWritableData_(const RFLiHiddenCharData* data) {
     return FALSE;
 }
 
-static int checkListWritableData_(const RFLiCtrlWriteList* list, u8 index, RFLiCharInfo* dst) {
+static int checkListWritableData_(const RFLiCtrlWriteDeleteList* list, u8 index, RFLiCharInfo* dst) {
     RFLiCharInfo info;
 
     if (list->isDelete[index] == TRUE && !RFLiGetCharInfo(&info, index) && !info.personal.localonly) {
@@ -413,7 +413,7 @@ static u8 getCtrlWritableCount_(const RFLiCtrlBuffer* buffer, BOOL isChMode) {
     return count;
 }
 
-static u8 getListWritableCount_(const RFLiCtrlWriteList* list) {
+static u8 getListWritableCount_(const RFLiCtrlWriteDeleteList* list) {
     u8 i;
     u8 count = 0;
     RFLiHiddenDBManager* manager = RFLiGetHDBManager();

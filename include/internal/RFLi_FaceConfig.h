@@ -59,6 +59,8 @@ extern "C" {
 #define RFLi_BEARD_SCALE_MAX    8
 #define RFLi_BEARD_Y_MAX        16
 
+/* MUSTACHE */
+
 /* GLASS */
 
 #define RFLi_GLASS_TYPE_MAX     8
@@ -77,6 +79,8 @@ extern "C" {
 
 #define RFLi_HEIGHT_MAX         128
 #define RFLi_BUILD_MAX          128
+
+/* TEXTURE STUFF */
 
 #ifdef __cplusplus
 }

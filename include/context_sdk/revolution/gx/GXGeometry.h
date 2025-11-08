@@ -1,13 +1,46 @@
+/* from wii-ipl */
+
 #ifndef REVOLUTION_GX_GEOMETRY_H
 #define REVOLUTION_GX_GEOMETRY_H
 
 #include <revolution/types.h>
+#include <revolution/gx/GXEnum.h>
+#include <revolution/gx/GXStruct.h>
+
+#include <revolution/os/OSError.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern u8   __GXinBegin;
+void                GXSetVtxDesc(GXAttr attr, GXAttrType type);
+void                GXClearVtxDesc();
+void                GXSetVtxAttrFmt(GXVtxFmt vtxfmt, GXAttr attr, GXCompCnt cnt, GXCompType type, u8 frac);
+void                GXSetVtxAttrFmtv(GXVtxFmt vtxfmt, const GXVtxAttrFmtList* list);
+void                GXSetArray(GXAttr attr, void* base_ptr, u8 stride);
+void                GXInvalidateVtxCache();
+void                GXSetTexCoordGen2(GXTexCoordID dst_coord, GXTexGenType func, GXTexGenSrc src_param, u32 mtx, GXBool normalize, u32 pt_texmtx);
+void                GXSetNumTexGens(u8 nTexGens);
+
+static inline void  GXSetTexCoordGen(GXTexCoordID dst_coord, GXTexGenType func, GXTexGenSrc src_param, u32 mtx) {
+    GXSetTexCoordGen2(dst_coord, func, src_param, mtx, GX_FALSE, GX_PTIDENTITY);
+}
+
+void                GXBegin(GXPrimitive type, GXVtxFmt vtxfmt, u16 nverts);
+
+static inline void GXEnd() {
+#if DEBUG
+    extern GXBool __GXinBegin;
+    if (!__GXinBegin) {
+        OSPanic(__FILE__, 127, "GXEnd: called without a GXBegin");
+    }
+    __GXinBegin = GX_FALSE;
+#endif
+}
+
+void                GXSetLineWidth(u8 width, GXTexOffset texOffsets);
+void                GXSetPointSize(u8 pointSize, GXTexOffset texOffsets);
+void                GXEnableTexOffsets(GXTexCoordID coord, u8 line_enable, u8 point_enable);
 
 #ifdef __cplusplus
 }

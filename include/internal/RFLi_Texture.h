@@ -51,7 +51,7 @@ typedef struct {
 } RFLTexObj;
 
 static inline void* RFLiGetTexImage(const RFLTexture* tex) {
-
+    return (u8*)tex + tex->imageOffset;
 }
 
 #ifdef __cplusplus

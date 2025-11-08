@@ -259,7 +259,7 @@ config.libs = [
             Object(DebugMatching,       ReleaseMatching,    "RFL_NANDLoader.c"),
             Object(DebugNonMatching,    ReleaseNonMatching, "RFL_NANDAccess.c"),
             Object(DebugNonMatching,    ReleaseNonMatching, "RFL_Model.c"),
-            Object(DebugNonMatching,    ReleaseNonMatching, "RFL_MakeTex.c"),
+            Object(DebugEquivalent,     ReleaseMatching,    "RFL_MakeTex.c"),
             Object(DebugNonMatching,    ReleaseNonMatching, "RFL_Icon.c"),
             Object(DebugEquivalent,     ReleaseMatching,    "RFL_HiddenDatabase.c"),
             Object(DebugMatching,       ReleaseMatching,    "RFL_Database.c"),
