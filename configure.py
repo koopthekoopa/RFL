@@ -265,7 +265,7 @@ config.libs = [
             Object(DebugMatching,       ReleaseMatching,    "RFL_Database.c"),
             Object(DebugMatching,       ReleaseMatching,    "RFL_Controller.c"),
             Object(DebugMatching,       ReleaseMatching,    "RFL_MiddleDatabase.c"),
-            Object(DebugNonMatching,    ReleaseNonMatching, "RFL_MakeRandomFace.c"),
+            Object(DebugMatching,       ReleaseMatching,    "RFL_MakeRandomFace.c"),
             Object(DebugMatching,       ReleaseMatching,    "RFL_DefaultDatabase.c"),
             Object(DebugMatching,       ReleaseMatching,    "RFL_DataUtility.c"),
             Object(DebugNonMatching,    ReleaseNonMatching, "RFL_NWC24.c"),
