@@ -207,15 +207,10 @@ static void retry_(RFLiFileType type, RFLSimpleCBArg cb, u8 count) {
 
 static void createcallback_(s32 result, NANDCommandBlock* block);
 
-// DEBUG AND RELEASE NON MATCH
-static void opencallback_(s32 result /* r26 */, NANDCommandBlock* block /* r31+0x8 */) {
-    RFLiFileType type; // r28
-    RFLiNANDAccessInfo* info; // r30
-    BOOL callCB; // r29
-
-    callCB = TRUE; // r29
-    type = RFLiGetType(block); // r28
-    info = RFLiGetAccInfo(type); // r30
+static void opencallback_(s32 result, NANDCommandBlock* block) {
+    BOOL callCB = TRUE;
+    RFLiFileType type = RFLiGetType(block);
+    RFLiNANDAccessInfo* info = RFLiGetAccInfo(type);
 
     switch (result) {
         case NAND_RESULT_OK: {
@@ -241,18 +236,15 @@ static void opencallback_(s32 result /* r26 */, NANDCommandBlock* block /* r31+0
                 RFLiEndWorkingReason(RFLErrcode_NANDCommandfail, result);
             }
             else {
-                s32 create; // r27
-                NANDCommandBlock* block; // r25
-
-                block = RFLiSetCommandBlock(type, RFLiAsyncTag_CreateAsync);
-                create = NANDPrivateCreateAsync(info->openinfo.filename, info->openinfo.permission, info->openinfo.attribute, createcallback_, block);
+                NANDCommandBlock* block = RFLiSetCommandBlock(type, RFLiAsyncTag_CreateAsync);
+                s32 create = NANDPrivateCreateAsync(info->openinfo.filename, info->openinfo.permission, info->openinfo.attribute, createcallback_, block);
                 switch (create) {
                     case NAND_RESULT_OK: {
                         callCB = FALSE;
                         break;
                     }
                     default: {
-                        RFLiEndWorkingReason(RFLErrcode_NANDCommandfail, result);
+                        RFLiEndWorkingReason(RFLErrcode_NANDCommandfail, create);
                         break;
                     }
                 }
