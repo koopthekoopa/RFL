@@ -8,6 +8,12 @@
 extern "C" {
 #endif
 
+typedef enum MEMHeapOpt {
+    MEM_HEAP_OPT_CLEAR_ALLOC    = (1 << 0),
+    MEM_HEAP_OPT_DEBUG_FILL     = (1 << 1),
+    MEM_HEAP_OPT_THREAD_SAFE    = (1 << 2)
+} MEMHeapOpt;
+
 typedef struct MEMiHeapHead {
     u32 signature; // 0x00
     struct {

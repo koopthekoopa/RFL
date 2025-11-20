@@ -10,6 +10,12 @@
 extern "C" {
 #endif
 
+/* Available builds:
+    20080218
+    20080306 (used)
+*/
+#define RFL_BUILD   20080306
+
 #ifndef KEEP_OLD_NULL
 #ifdef NULL
 #undef NULL

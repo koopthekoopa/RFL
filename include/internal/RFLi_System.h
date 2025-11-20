@@ -12,7 +12,7 @@
 
 #include <internal/RFLi_Controller.h>
 
-#include <revolution/mem/heapHandle.h>
+#include <revolution/mem/heapCommon.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,8 +44,10 @@ typedef struct {
     RFLiNANDAccessInfo  mAccInfo[RFLiFileType_Max];     // 0x1B50
 
     RFLSimpleCB         mSysCB;                         // 0x1F10
+#if RFL_BUILD >= 20080306
     RFLSimpleCB         mDrawIconCB;                    // 0x1F14
     RFLSimpleCB         mCreateModelCB;                 // 0x1F18
+#endif // RFL_BUILD
 
     u8                  macaddr[RFL_MAC_ADDR_LENGTH];   // 0x1F1C
 } RFLiSysManager;

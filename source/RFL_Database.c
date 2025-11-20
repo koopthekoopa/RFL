@@ -815,7 +815,7 @@ static BOOL createLowAddr_(u32* dst) {
     }
 
     if (!isFirst) {
-        sum &= ~(1 << 7);
+        sum &= 0x7F /* (1 << 7) */;
     }
 
     ret = sum << 24;

@@ -1,7 +1,7 @@
 #ifndef REVOLUTION_MEM_EXP_HEAP_H
 #define REVOLUTION_MEM_EXP_HEAP_H
 
-#include <revolution/mem/heapHandle.h>
+#include <revolution/mem/heapCommon.h>
 
 #ifdef __cplusplus
 extern "C" {

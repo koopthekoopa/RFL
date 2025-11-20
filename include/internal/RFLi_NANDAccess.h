@@ -4,7 +4,7 @@
 #include <RFL_Types.h>
 #include <internal/RFLi_Types.h>
 
-#include <revolution/mem/heapHandle.h>
+#include <revolution/mem/heapCommon.h>
 #include <revolution/nand.h>
 #include <revolution/os/OSAlarm.h>
 

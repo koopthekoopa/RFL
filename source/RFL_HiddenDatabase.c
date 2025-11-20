@@ -362,7 +362,11 @@ static BOOL checkCtrlWritableData_(const RFLiCtrlBuffer* buffer, u8 index, BOOL 
 }
 
 static BOOL checkOneWritableData_(const RFLiHiddenCharData* data) {
-    if (RFLiIsValidID((RFLCreateID*)&data->createID) && !data->localonly && !RFLSearchOfficialData((RFLCreateID*)&data->createID, NULL)) {
+    if (RFLiIsValidID((RFLCreateID*)&data->createID) && !data->localonly && !RFLSearchOfficialData((RFLCreateID*)&data->createID, NULL)
+#if RFL_BUILD < 20080306
+    && (RFLiSearchHiddenData((RFLCreateID*)&data->createID) == -1 || !RFLiIsMyHomeID((RFLCreateID*)&data->createID))
+#endif
+    ) {
         return TRUE;
     }
     return FALSE;

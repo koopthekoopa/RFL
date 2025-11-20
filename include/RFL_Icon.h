@@ -26,7 +26,10 @@ typedef struct {
 } RFLIconSetting;
 
 RFLErrcode  RFLMakeIcon(void* buf, RFLDataSource source, RFLMiddleDatabase* middleDB, u16 index, RFLExpression expression, const RFLIconSetting* setting);
+
+#if RFL_BUILD >= 20080306
 void        RFLSetIconDrawDoneCallback(RFLSimpleCB cb);
+#endif // RFL_BUILD
 
 #ifdef __cplusplus
 }

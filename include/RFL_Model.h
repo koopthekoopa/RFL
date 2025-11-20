@@ -79,7 +79,9 @@ void            RFLDrawXluCore(const RFLCharModel* charModel, const RFLDrawCoreS
 void            RFLDrawShape(const RFLCharModel* charModel);
 void            RFLCopyCharModel(RFLCharModel* dstCharModel, void* dstBufferPtr, const RFLCharModel* srcCharModel);
 
+#if RFL_BUILD >= 20080306
 void            RFLSetModelDrawDoneCallback(RFLSimpleCB cb);
+#endif
 
 #ifdef __cplusplus
 }

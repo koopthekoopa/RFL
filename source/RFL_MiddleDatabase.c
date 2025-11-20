@@ -116,23 +116,25 @@ static void updateHDBcallback_(u32 arg) {
     
     if (RFLGetAsyncStatus() == RFLErrcode_Success || RFLGetAsyncStatus() == RFLErrcode_Broken) {
         s16 src = -1;
+
+#if RFL_BUILD >= 20080306
         BOOL bFind;
         RFLiDatabaseManager* manager = RFLiGetDBManager();
-
         do {
             bFind = FALSE;
-
+#endif
             if (db->type == RFLMiddleDBType_HiddenOlder) {
                 src = RFLiGetHiddenNext(param->srcIdx);
             }
             else {
                 src = RFLiGetHiddenPrev(param->srcIdx);
             }
-
+#if RFL_BUILD >= 20080306
             if (src != -1 && (param->sex == RFLSex_All || param->sex == manager->mDatabase->hidden.data[src].sex)) {
                 bFind = TRUE;
             }
         } while (src != -1 && !bFind);
+#endif
 
         if (RFLGetAsyncStatus() != RFLErrcode_Broken && checkHiddenData_(&db->data[db->storedSize])) {
             db->storedSize++;
@@ -238,9 +240,10 @@ static void updateHiddenOld_(RFLiMiddleDB* db, BOOL oldIsHead, BOOL use_cache) {
 
     {
         s16 src = -1;
+
+#if RFL_BUILD >= 20080306
         BOOL bFind;
         RFLiDatabaseManager* manager = RFLiGetDBManager();
-
         do {
             bFind = FALSE;
             src = stepOne_(src, oldIsHead);
@@ -248,6 +251,9 @@ static void updateHiddenOld_(RFLiMiddleDB* db, BOOL oldIsHead, BOOL use_cache) {
                 bFind = TRUE;
             }
         } while (src != -1 && !bFind);
+#else
+        src = stepOne_(param->srcIdx, oldIsHead);
+#endif
 
         if (src >= 0) {
             param->srcIdx = src;

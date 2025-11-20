@@ -7,6 +7,7 @@
 
 #include <revolution/os.h>
 #include <revolution/nand.h>
+#include <private/nand.h>
 
 #include <string.h>
 
@@ -106,12 +107,15 @@ static void endWorkingClose_(RFLErrcode errcode) {
     endWorkingCloseReason_(errcode, 0);
 }
 
-// DEBUG NON MATCH
 void RFLiEndWorkingReason(RFLErrcode errcode, s32 reason) {
     BOOL b;
     RFLi_ASSERTLINE(RFLAvailable(), 238);
 
-    switch ((int)RFLiGetManager()->mLastErrcode) {
+    switch (RFLiGetManager()->mLastErrcode) {
+        default: {
+            (void)0; // match hack
+            break;
+        }
         case RFLErrcode_Busy:
         case RFLErrcode_Success: {
             b = OSDisableInterrupts();
@@ -121,9 +125,6 @@ void RFLiEndWorkingReason(RFLErrcode errcode, s32 reason) {
             RFLiGetManager()->mLastReason = reason;
 
             OSRestoreInterrupts(b);
-            break;
-        }
-        default: {
             break;
         }
     }
