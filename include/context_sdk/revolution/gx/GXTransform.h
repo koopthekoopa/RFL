@@ -18,7 +18,7 @@ extern "C" {
 void GXSetProjection(const Mtx44 mtx, GXProjectionType type);
 void GXSetProjectionv(const f32* ptr);
 
-void GXLoadPosMtxImm(Mtx mtx, u32 id);
+void GXLoadPosMtxImm(const Mtx mtx, u32 id);
 
 void GXLoadNrmMtxImm(const Mtx mtx, u32 id);
 

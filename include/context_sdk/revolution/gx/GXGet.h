@@ -18,6 +18,7 @@ u16             GXGetTexObjWidth(const GXTexObj* to);
 u16             GXGetTexObjHeight(const GXTexObj* to);
 GXTexWrapMode   GXGetTexObjWrapS(const GXTexObj* to);
 GXTexWrapMode   GXGetTexObjWrapT(const GXTexObj* to);
+void*           GXGetTexObjData(const GXTexObj* to);
 
 // Transform
 void            GXGetProjectionv(f32* ptr);

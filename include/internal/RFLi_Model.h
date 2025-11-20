@@ -29,6 +29,18 @@ typedef struct {
 } RFLiPositionData;
 
 typedef struct {
+    Mtx             posMtx;                 // 0x00
+    Mtx             nrmMtx;                 // 0x30
+
+    RFLExpression   expressionIdx;          // 0x60
+    RFLResolution   resolution;             // 0x64
+
+    void*           resource;               // 0x68
+
+    GXTexObj*       maskTexObj[RFLExp_Max]; // 0x6C
+} RFLiCharModel;
+
+typedef struct {
     u8          dlNose[192];            // 0x00
     u8          dlCap[1376];            // 0xC0
     u8          dlFaceline[736];        // 0x620
@@ -95,27 +107,33 @@ typedef struct {
 } RFLiCharModelRes;
 
 typedef struct {
-    RFLiPartsShp parts; // 0x00
-    u16 index; // 0x04
-    int transform; // 0x08
-    BOOL flipX; // 0x0C
-    s16* vtxPosBuf; // 0x10
-    s16* vtxNrmBuf; // 0x14
-    s16* vtxTxcBuf; // 0x18
-    u8* dlBuf; // 0x1C
-    u16 vtxPosBufSize; // 0x20
-    u16 vtxNrmBufSize; // 0x22
-    u16 vtxTxcBufSize; // 0x24
-    u16 dlBufSize; // 0x26
-    u16 vtxPosSize; // 0x28
-    u16 vtxNrmSize; // 0x2A
-    u16 vtxTxcSize; // 0x2C
-    u16 dlSize; // 0x2E
-    f32 posScale; // 0x30
-    RFLiPositionData* posTrans; // 0x34
-    RFLiPositionData* noseTrans; // 0x38
-    RFLiPositionData* beardTrans; // 0x3C
-    RFLiPositionData* hairTrans; // 0x40
+    RFLiPartsShp        parts;          // 0x00
+    u16                 index;          // 0x04
+
+    BOOL                transform;      // 0x08
+    BOOL                flipX;          // 0x0C
+
+    s16*                vtxPosBuf;      // 0x10
+    s16*                vtxNrmBuf;      // 0x14
+    s16*                vtxTxcBuf;      // 0x18
+    u8*                 dlBuf;          // 0x1C
+
+    u16                 vtxPosBufSize;  // 0x20
+    u16                 vtxNrmBufSize;  // 0x22
+    u16                 vtxTxcBufSize;  // 0x24
+    u16                 dlBufSize;      // 0x26
+
+    u16                 vtxPosSize;     // 0x28
+    u16                 vtxNrmSize;     // 0x2A
+    u16                 vtxTxcSize;     // 0x2C
+    u16                 dlSize;         // 0x2E
+
+    f32                 posScale;       // 0x30
+    RFLiPositionData*   posTrans;       // 0x34
+
+    RFLiPositionData*   noseTrans;      // 0x38
+    RFLiPositionData*   beardTrans;     // 0x3C
+    RFLiPositionData*   hairTrans;      // 0x40
 } RFLiCharShapeRes;
 
 extern RFLiCoordinateData coordinateData;

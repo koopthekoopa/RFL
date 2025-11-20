@@ -55,6 +55,22 @@ u32     __OSCoreClock                   ADDRESS(OS_BASE_CACHED + 0x00FC);
 u32 OSGetTick();
 s64 OSGetTime();
 
+#ifdef DEBUG
+void* OSPhysicalToCached(u32 paddr);
+void* OSPhysicalToUncached(u32 paddr);
+u32 OSCachedToPhysical(void* caddr);
+u32 OSUncachedToPhysical(void* ucaddr);
+void* OSCachedToUncached(void* caddr);
+void* OSUncachedToCached(void* ucaddr);
+#else
+#define OSPhysicalToCached(paddr)    ((void*) ((u32)(OS_BASE_CACHED   + (u32)(paddr))))
+#define OSPhysicalToUncached(paddr)  ((void*) ((u32)(OS_BASE_UNCACHED + (u32)(paddr))))
+#define OSCachedToPhysical(caddr)    ((u32)   ((u32)(caddr)  - OS_BASE_CACHED))
+#define OSUncachedToPhysical(ucaddr) ((u32)   ((u32)(ucaddr) - OS_BASE_UNCACHED))
+#define OSCachedToUncached(caddr)    ((void*) ((u8*)(caddr)  + (OS_BASE_UNCACHED - OS_BASE_CACHED)))
+#define OSUncachedToCached(ucaddr)   ((void*) ((u8*)(ucaddr) - (OS_BASE_UNCACHED - OS_BASE_CACHED)))
+#endif
+
 #ifdef __cplusplus
 }
 #endif

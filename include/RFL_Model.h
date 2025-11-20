@@ -14,10 +14,10 @@ extern "C" {
 typedef enum {
     RFLCoordinate_XP = 0x01000000,
     RFLCoordinate_XM = 0xFF000000,
-    RFLCoordinate_YP = 0x010000,
-    RFLCoordinate_YM = 0xFF0000,
-    RFLCoordinate_ZP = 0x0100,
-    RFLCoordinate_ZM = 0xFF00,
+    RFLCoordinate_YP = 0x00010000,
+    RFLCoordinate_YM = 0x00FF0000,
+    RFLCoordinate_ZP = 0x00000100,
+    RFLCoordinate_ZM = 0x0000FF00,
 } RFLCoordinate;
 
 typedef struct {
@@ -33,7 +33,7 @@ typedef struct {
 
     GXColor     ambientColor; // 0x10
 
-    u8          zCompLoc; // 0x14
+    GXBool      zCompLoc; // 0x14
 } RFLDrawSetting;
 
 typedef struct {
@@ -49,7 +49,7 @@ typedef struct {
 
     GXPosNrmMtx     posNrmMtxID; // 0x1C
 
-    u8              reverseCulling; // 0x20
+    GXBool          reverseCulling; // 0x20
 } RFLDrawCoreSetting;
 
 void            RFLSetCoordinate(RFLCoordinate up, RFLCoordinate front);
@@ -58,8 +58,8 @@ u32             RFLGetModelBufferSize(RFLResolution resolution, u32 expressionFl
 
 RFLErrcode      RFLInitCharModel(RFLCharModel* charModel, RFLDataSource source, RFLMiddleDatabase* middleDB, u16 index, void* bufferPtr, RFLResolution resolution, u32 expressionFlag);
 
-void            RFLSetMtx(RFLCharModel* charModel, const Mtx mvMtx);
-void            RFLSetMtxPosNrm(RFLCharModel* charModel, const Mtx posMtx,const Mtx nrmMtx);
+void            RFLSetMtx(RFLCharModel* charModel, const MtxPtr mvMtx);
+void            RFLSetMtxPosNrm(RFLCharModel* charModel, const MtxPtr posMtx, const MtxPtr nrmMtx);
 
 void            RFLSetExpression(RFLCharModel* charModel, RFLExpression expression);
 RFLExpression   RFLGetExpression(const RFLCharModel* charModel);
@@ -77,7 +77,7 @@ void            RFLDrawOpaCore(const RFLCharModel* charModel, const RFLDrawCoreS
 void            RFLDrawXluCore(const RFLCharModel* charModel, const RFLDrawCoreSetting* setting);
 
 void            RFLDrawShape(const RFLCharModel* charModel);
-void            RFLCopyCharModel(RFLCharModel* dstCharModel, void* dstBufferPtr, RFLCharModel* srcCharModel);
+void            RFLCopyCharModel(RFLCharModel* dstCharModel, void* dstBufferPtr, const RFLCharModel* srcCharModel);
 
 void            RFLSetModelDrawDoneCallback(RFLSimpleCB cb);
 
