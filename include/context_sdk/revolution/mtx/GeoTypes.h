@@ -7,6 +7,10 @@
 extern "C" {
 #endif
 
+typedef struct {
+    f32 x, y, z;
+} Vec, *VecPtr, Point3d, *Point3dPtr;
+
 typedef f32 Mtx[3][4];
 typedef f32 (*MtxPtr)[4];
 

@@ -34,6 +34,7 @@ extern "C" {
 #define MTXScale        PSMTXScale
 #define MTXScaleApply   PSMTXScaleApply
 #endif // DEBUG
+#define MTXLookAt       C_MTXLookAt
 
 /* ASM implementations */
 void    PSMTXIdentity(Mtx m);
@@ -60,11 +61,25 @@ void    C_MTXTrans(Mtx m, f32 xT, f32 yT, f32 zT);
 void    C_MTXTransApply(const Mtx src, Mtx dst, f32 xT, f32 yT, f32 zT);
 void    C_MTXScale(Mtx m, f32 xS, f32 yS, f32 zS);
 void    C_MTXScaleApply(const Mtx src, Mtx dst, f32 xS, f32 yS, f32 zS);
+void    C_MTXLookAt(Mtx m, const Point3d* camPos, const Vec* camUp, const Point3d* target);
+
+
+// MtxVec
+
+void    PSMTXMultVec(const Mtx m, const Vec* src, Vec* dst);
+
+void    C_MTXMultVec(const Mtx m, const Vec* src, Vec* dst);
+
+#ifdef DEBUG
+#define MTXMultVec  C_MTXMultVec
+#else
+#define MTXMultVec  PSMTXMultVec
+#endif // DEBUG
 
 // Mtx44
 
 #define MTXFrustum      C_MTXFrustum
-#define MTXFrustum      C_MTXFrustum
+#define MTXPerspective  C_MTXPerspective
 #define MTXOrtho        C_MTXOrtho
 
 /* C implementations only */
