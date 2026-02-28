@@ -601,7 +601,7 @@ void RFLDrawXluCore(const RFLCharModel* charModel, const RFLDrawCoreSetting* set
     }
 }
 
-// DEBUG NON MATCH AND FAKE MATCH RELEASE
+// DEBUG NON MATCH AND RELEASE FAKE MATCH
 void RFLiInitCharModelRes(RFLiCharModelRes* charModelRes /* r30 */, const RFLiCharInfo* info /* r29 */) {
     RFLiPositionData noseTrans; // r31+0x38
     RFLiPositionData beardTrans; // r31+0x2C

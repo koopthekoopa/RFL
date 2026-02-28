@@ -6,6 +6,7 @@
 #include <internal/RFLi_Debug.h>
 
 #include <revolution/os.h>
+#include <private/nand.h>
 #include <revolution/nand.h>
 
 #include <string.h>

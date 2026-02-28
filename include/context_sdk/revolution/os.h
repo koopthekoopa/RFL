@@ -13,6 +13,7 @@ extern "C" {
 #include <revolution/os/OSCache.h>
 #include <revolution/os/OSMutex.h>
 #include <revolution/os/OSThread.h>
+#include <revolution/os/OSTime.h>
 
 #include <revolution/os/OSError.h>
 
@@ -51,9 +52,6 @@ u32     __OSCoreClock                   ADDRESS(OS_BASE_CACHED + 0x00FC);
 #define OSSleepMilliseconds(ms)         OSSleepTicks(OSMillisecondsToTicks((OSTime)ms))
 #define OSSleepMicroseconds(us)         OSSleepTicks(OSMicrosecondsToTicks((OSTime)us))
 #define OSSleepNanoseconds(ns)          OSSleepTicks(OSNanosecondsToTicks((OSTime)ns))
-
-u32 OSGetTick();
-s64 OSGetTime();
 
 #ifdef DEBUG
 void* OSPhysicalToCached(u32 paddr);

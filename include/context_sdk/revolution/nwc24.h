@@ -7,9 +7,42 @@
 extern "C" {
 #endif
 
+#define NWC24_FRIEND_INFO_MAX   100
+
+typedef enum NWC24FriendType {
+    NWC24_FRIENDTYPE_NONE = 0,
+    NWC24_FRIENDTYPE_WII,
+    NWC24_FRIENDTYPE_EMAIL,
+} NWC24FriendType;
+
+typedef enum NWC24FriendStatus {
+    NWC24_FRIENDSTATUS_NONE = 0,
+    NWC24_FRIENDSTATUS_PENDING,
+    NWC24_FRIENDSTATUS_CONFIRMED,
+    NWC24_FRIENDSTATUS_DECLINED,
+} NWC24FriendStatus;
+
 typedef struct NWC24MsgObj {
     u32 data[64];
 } NWC24MsgObj;
+
+typedef struct NWC24FriendAttr {
+    u32 type;           // 0x00
+    u32 status;         // 0x04
+    u16 name[12];       // 0x08
+    u64 fdId;           // 0x20
+    u32 reserved[6];    // 0x28
+} NWC24FriendAttr;
+
+typedef union NWC24FriendAddr {
+    u64     wiiId;          // 0x00
+    char    mailAddr[256];  // 0x00
+} NWC24FriendAddr;
+
+typedef struct NWC24FriendInfo {
+    NWC24FriendAttr attr;   // 0x00
+    NWC24FriendAddr addr;   // 0x40
+} NWC24FriendInfo;
 
 typedef enum NWC24Err {
     NWC24_OK = 0,
@@ -65,6 +98,41 @@ typedef enum NWC24Err {
     NWC24_ERR_SCRIPT_VERSION = -50,
     NWC24_ERR_GIVE_UP = -51,
 } NWC24Err;
+
+typedef enum NWC24MsgType {
+    NWC24_MSGTYPE_RVL_MENU_SHARED   = 0,
+    NWC24_MSGTYPE_WII_MENU_SHARED   = 0,
+
+    NWC24_MSGTYPE_RVL               = 1,
+    NWC24_MSGTYPE_RVL_APPZ          = 1,
+    NWC24_MSGTYPE_RVL_APP_ONLY      = 1,
+    NWC24_MSGTYPE_WII               = 1,
+    NWC24_MSGTYPE_WII_APP           = 1,
+    NWC24_MSGTYPE_WII_APP_ONLY      = 1,
+
+    NWC24_MSGTYPE_RVL_MENU          = 2,
+    NWC24_MSGTYPE_RVL_MENU_ONLY     = 2,
+    NWC24_MSGTYPE_WII_MENU          = 2,
+    NWC24_MSGTYPE_WII_MENU_ONLY     = 2,
+
+    NWC24_MSGTYPE_RVL_APP_HIDDEN    = 3,
+    NWC24_MSGTYPE_RVL_HIDDEN        = 3,
+    NWC24_MSGTYPE_WII_APP_HIDDEN    = 3,
+    NWC24_MSGTYPE_WII_HIDDEN        = 3,
+
+    NWC24_MSGTYPE_PUBLIC            = 4
+} NWC24MsgType;
+
+NWC24Err    NWC24InitMsgObj(NWC24MsgObj* msg, NWC24MsgType type);
+
+NWC24Err    NWC24SetMsgToId(NWC24MsgObj* msg, u64 id);
+NWC24Err    NWC24SetMsgFaceData(const NWC24MsgObj* obj, const u8* data);
+
+NWC24Err    NWC24ReadMsgFaceData(const NWC24MsgObj* obj, u8* data);
+
+NWC24Err    NWC24CommitMsg(const NWC24MsgObj* obj);
+
+NWC24Err    NWC24ReadFriendInfo(NWC24FriendInfo* info, u32 index);
 
 #ifdef __cplusplus
 }
