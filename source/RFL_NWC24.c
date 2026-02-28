@@ -9,7 +9,7 @@
 #include <revolution/nwc24.h>
 
 #include <string.h>
-#pragma sym on
+
 #define GET_ARRAY_LENGTH(x)     (sizeof(x)/sizeof(x[0]))
 
 #define SEARCH_COUNT            20

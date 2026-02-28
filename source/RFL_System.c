@@ -43,7 +43,7 @@ static void* allocSys_(u32 size, int alignment) {
     return MEMAllocFromExpHeapEx(RFLiGetManager()->mSystemHeap, size, alignment);
 }
 
-// DEBUG NON MATCH
+// DEBUG NON MATCH (https://decomp.me/scratch/R63gU)
 RFLErrcode RFLInitResAsync(void* workBuffer, void* resBuffer, u32 resSize, BOOL useDeluxTex) {
     RFLErrcode errcode;
 

@@ -559,7 +559,7 @@ static void writeCallback_() {
     }
 }
 
-// DEBUG NON MATCH
+// DEBUG NON MATCH (https://decomp.me/scratch/l7B9S)
 static void writeData_(const RFLiHiddenCharData* data /* r27 */) {
     RFLiHiddenDBManager* manager = RFLiGetHDBManager(); // r31
     s32 offset = 0; // r29

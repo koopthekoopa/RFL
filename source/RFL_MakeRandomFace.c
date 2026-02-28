@@ -14,7 +14,7 @@
 
 #define DEFAULT_NAME    L"no name"
 
-#define ARRAY_SIZE(x) (sizeof((x)) / sizeof((x)[0]))
+#define GET_ARRAY_LENGTH(x) (sizeof((x)) / sizeof((x)[0]))
 
 void RFLi_MakeRandomFace_Core(RFLiCharInfo* pCharInfo, RFLi_SEX argSex, RFLi_AGE argAge, RFLi_RACE argRace);
 
@@ -204,7 +204,7 @@ void RFLi_MakeRandomFace_Core(RFLiCharInfo* pCharInfo, RFLi_SEX argSex, RFLi_AGE
     for (i = 0; i < RFL_NAME_LENGTH + 1; i++) {
         pCharInfo->personal.name[i] = 0;
     }
-    wcsncpy(pCharInfo->personal.name, (wchar_t*)DEFAULT_NAME, ARRAY_SIZE(DEFAULT_NAME)-1);
+    wcsncpy(pCharInfo->personal.name, (wchar_t*)DEFAULT_NAME, GET_ARRAY_LENGTH(DEFAULT_NAME)-1);
 
     for (i = 0; i < RFL_NAME_LENGTH + 1; i++) {
         pCharInfo->personal.creator[i] = 0;
@@ -245,7 +245,7 @@ u8 RFLi_GetFacelineType(RFLi_SEX sex, RFLi_AGE age,  RFLi_RACE race) {
     RFLi_ASSERTLINE_RANGE(age, RFLAge_Child, RFLAge_All, 303);
     RFLi_ASSERTLINE_RANGE(race, RFLRace_Black, RFLAge_All, 304);
 
-    return facelineTypeTable[(sex*9) + (age*3) + race] [RFLi_GetRandU32(ARRAY_SIZE(facelineTypeTable[0]))];
+    return facelineTypeTable[(sex*9) + (age*3) + race] [RFLi_GetRandU32(GET_ARRAY_LENGTH(facelineTypeTable[0]))];
 }
 
 u8 RFLi_GetHairType(RFLi_SEX sex, RFLi_AGE age, RFLi_RACE race) {
@@ -440,7 +440,7 @@ u8 RFLi_GetFaceTexType(RFLi_SEX sex, RFLi_AGE age, RFLi_RACE race) {
     RFLi_ASSERTLINE_RANGE(age, RFLAge_Child, RFLAge_All, 509);
     RFLi_ASSERTLINE_RANGE(race, RFLRace_Black, RFLAge_All, 510);
 
-    return faceTexTypeTable[(sex * 9) + (age * 3) + race] [RFLi_GetRandU32(ARRAY_SIZE(faceTexTypeTable[0]))];
+    return faceTexTypeTable[(sex * 9) + (age * 3) + race] [RFLi_GetRandU32(GET_ARRAY_LENGTH(faceTexTypeTable[0]))];
 }
 
 u8 RFLi_GetGlassType(RFLi_AGE age) {
@@ -520,7 +520,7 @@ u8 RFLi_GetFaceColor(RFLi_SEX sex, RFLi_RACE race) {
     RFLi_ASSERTLINE_RANGE(sex, RFLSex_Male, RFLSex_All, 563);
     RFLi_ASSERTLINE_RANGE(race, RFLRace_Black, RFLAge_All, 564);
 
-    return faceColorTable[(sex * 3) + race] [RFLi_GetRandU32(ARRAY_SIZE(faceColorTable[0]))];
+    return faceColorTable[(sex * 3) + race] [RFLi_GetRandU32(GET_ARRAY_LENGTH(faceColorTable[0]))];
 }
 
 u8 RFLi_GetHairColor(RFLi_AGE age, RFLi_RACE race) {
@@ -539,7 +539,7 @@ u8 RFLi_GetHairColor(RFLi_AGE age, RFLi_RACE race) {
     RFLi_ASSERTLINE_RANGE(age, RFLAge_Child, RFLAge_All, 584);
     RFLi_ASSERTLINE_RANGE(race, RFLRace_Black, RFLAge_All, 585);
 
-    return hairColorTable[(race * 4 - race) + age] [RFLi_GetRandU32(ARRAY_SIZE(hairColorTable[0]))];
+    return hairColorTable[(race * 4 - race) + age] [RFLi_GetRandU32(GET_ARRAY_LENGTH(hairColorTable[0]))];
 }
 
 u8 RFLi_GetEyeColor(RFLi_RACE race) {
@@ -551,7 +551,7 @@ u8 RFLi_GetEyeColor(RFLi_RACE race) {
 
     RFLi_ASSERTLINE_RANGE(race, RFLRace_Black, RFLAge_All, 599);
 
-    return eyeColorTable[race][RFLi_GetRandU32(ARRAY_SIZE(eyeColorTable[0]))];
+    return eyeColorTable[race][RFLi_GetRandU32(GET_ARRAY_LENGTH(eyeColorTable[0]))];
 }
 
 u32 RFLi_GetRandU32(u32 max) {

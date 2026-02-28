@@ -16,7 +16,7 @@
 #include <stddef.h>
 #include <string.h>
 
-#define ARRAY_SIZE(x)       (sizeof((x)) / sizeof((x)[0]))
+#define GET_ARRAY_LENGTH(x) (sizeof((x)) / sizeof((x)[0]))
 
 #define VTX_COORDS_IN_POS   3
 #define VTX_COORDS_IN_NRM   3
@@ -376,7 +376,7 @@ GXColor RFLiGetFacelineColor(const RFLiCharInfo* info) {
 
     RFLi_ASSERTLINE_NULL(info, 564);
 
-    if (info->faceline.color < ARRAY_SIZE(cFacelineColor)) {
+    if (info->faceline.color < GET_ARRAY_LENGTH(cFacelineColor)) {
         color = info->faceline.color;
     }
 
@@ -601,7 +601,7 @@ void RFLDrawXluCore(const RFLCharModel* charModel, const RFLDrawCoreSetting* set
     }
 }
 
-// DEBUG NON MATCH AND RELEASE FAKE MATCH
+// DEBUG NON MATCH AND RELEASE FAKE MATCH (https://decomp.me/scratch/WCvYt)
 void RFLiInitCharModelRes(RFLiCharModelRes* charModelRes /* r30 */, const RFLiCharInfo* info /* r29 */) {
     RFLiPositionData noseTrans; // r31+0x38
     RFLiPositionData beardTrans; // r31+0x2C
@@ -855,7 +855,7 @@ void RFLiInitCharModelRes(RFLiCharModelRes* charModelRes /* r30 */, const RFLiCh
     DCFlushRange(charModelRes, sizeof(RFLiCharModelRes)+0x10 /*?*/);
 }
 
-// DEBUG NON MATCH
+// DEBUG NON MATCH (https://decomp.me/scratch/djwFR)
 void RFLiInitShapeRes(RFLiCharShapeRes* arg /* r30 */) {
     void* res; // r31+0xE8
     u8* ptr8; // r29
