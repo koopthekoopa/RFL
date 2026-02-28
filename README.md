@@ -1,15 +1,18 @@
 Revolution Face Library
 =======================
 
-A work-in-progress decompilation of the Revolution Face Library from left over library archives in *Challenge Me: Word Puzzles*.  
+A work-in-progress decompilation of the Revolution Face Library.  
 
 The library is responsible for handling Miis on the Nintendo Wii.  
 
 This repository does not contain any of the original objects. An existing copy of the game [`[SC5PGN]`](https://wiki.dolphin-emu.org/index.php?title=SC5PGN) *Challenge Me: Word Puzzles* is required. (See [Building](#building) below.)
 
 Supported versions:
-- 20080306 (default)
-- 20080216
+- 20080306 (from Challenge Me: Word Puzzles; **Default**)
+- 20080216 (from Wii Menu
+
+> [!WARNING]
+> Building is only supported for version **20080306** (Challenge Me: Word Puzzles)  
 
 Dependencies
 ============

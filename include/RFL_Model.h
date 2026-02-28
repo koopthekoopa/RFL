@@ -67,10 +67,10 @@ BOOL            RFLIsAvailableExpression(const RFLCharModel* charModel, RFLExpre
 
 GXColor         RFLGetFavoriteColor(RFLFavoriteColor favoriteColor);
 
-void            RFLLoadDrawSetting(const RFLDrawSetting* setting);
 void            RFLDrawOpa(const RFLCharModel* charModel);
 void            RFLDrawXlu(const RFLCharModel* charModel);
 
+void            RFLLoadDrawSetting(const RFLDrawSetting* setting);
 void            RFLLoadVertexSetting(const RFLDrawCoreSetting* setting);
 void            RFLLoadMaterialSetting(const RFLDrawCoreSetting* setting);
 

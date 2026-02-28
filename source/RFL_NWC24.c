@@ -9,8 +9,9 @@
 #include <revolution/nwc24.h>
 
 #include <string.h>
+#pragma sym on
+#define GET_ARRAY_LENGTH(x)     (sizeof(x)/sizeof(x[0]))
 
-#define ARRAY_LENGTH(x)         (sizeof(x)/sizeof(x[0]))
 #define SEARCH_COUNT            20
 #define FRIEND_RECEIVE_COUNT    8
 
@@ -29,6 +30,44 @@ BOOL RFLiNWC24Msg2CharData(RFLiCharData* rawdata, const NWC24MsgObj* obj) {
 
     return TRUE;
 }
+
+#if RFL_BUILD < 20080306
+RFLErrcode RFLiSetOfficial2NWC24Msg(NWC24MsgObj* obj, RFLCharData* charData, u16 index) {
+    RFLiCharData data;
+    RFLErrcode err1;
+    NWC24Err err2;
+
+    // (Original source lines unknown)
+    RFLi_ASSERTLINE_RANGE(index, 0, RFL_MAX_DATABASE, -1);
+    RFLi_ASSERTLINE_NULL(obj, -1);
+
+    if (!RFLAvailable()) {
+        return RFLErrcode_NotAvailable;
+    }
+
+    err1 = RFLiGetCharRawData(&data, index);
+    if (err1 != RFLErrcode_Success) {
+        return err1;
+    }
+
+    if (RFLiGetIsolation()) {
+        data.localonly = TRUE;
+    }
+
+    data.favorite = 0;
+
+    memcpy(charData, &data, sizeof(RFLCharData));
+
+    err2 = NWC24SetMsgFaceData(obj, charData);
+    if (err2 != NWC24_OK) {
+        RFLiGetManager()->mLastErrcode = RFLErrcode_NWC24Fail;
+        RFLiGetManager()->mLastReason = err2;
+        return RFLErrcode_NWC24Fail;
+    }
+
+    return RFLErrcode_Success;
+}
+#endif // RFL_BUILD
 
 RFLErrcode RFLCommitNWC24Msg(NWC24MsgObj* obj, u16 index) {
     RFLiCharData data;
@@ -236,7 +275,7 @@ RFLErrcode makeNWC24MsgforExchange_(NWC24MsgObj* obj, RFLCharData* sendTarget, B
         u16 stored = 0;
 
         int index;
-        for (index = 0; index < (int)ARRAY_LENGTH(sendData); index++) {
+        for (index = 0; index < (int)GET_ARRAY_LENGTH(sendData); index++) {
             sendData[index] = NULL;
         }
 
@@ -253,9 +292,17 @@ RFLErrcode makeNWC24MsgforExchange_(NWC24MsgObj* obj, RFLCharData* sendTarget, B
             RFLiMiddleDatabase* idb = (RFLiMiddleDatabase*)&middleDB;
 
             for (index = 0; index < stored; index++) {
+#if RFL_BUILD < 20080306
+                if (!idb->data[index].localonly) {
+                    sendData[sendNum] = RFLiAlloc32(sizeof(RFLCharData));
+                    RFLiConvertHRaw2Raw(&idb->data[index], (RFLiCharData*)sendData[sendNum]);
+                    sendNum++;
+                }
+#else
                 sendData[sendNum] = RFLiAlloc32(sizeof(RFLCharData));
                 RFLiConvertHRaw2Raw(idb->data, (RFLiCharData*)sendData[sendNum]);
                 sendNum++;
+#endif // RFL_BUILD
             }
         }
 
@@ -267,7 +314,7 @@ RFLErrcode makeNWC24MsgforExchange_(NWC24MsgObj* obj, RFLCharData* sendTarget, B
         u16* array = RFLiAlloc(count * sizeof(*array));
 
         if (array == NULL) {
-            for (index = 0; index < (int)ARRAY_LENGTH(sendData); index++) {
+            for (index = 0; index < (int)GET_ARRAY_LENGTH(sendData); index++) {
                 if (sendData[index] != NULL) {
                     RFLiFree(sendData[index]);
                 }
@@ -338,7 +385,7 @@ RFLErrcode makeNWC24MsgforExchange_(NWC24MsgObj* obj, RFLCharData* sendTarget, B
     OSReport("[RFL]SendNum: %d Miis\n", sendNum);
 
     if (sendNum == 0) {
-        for (index = 0; index < (int)ARRAY_LENGTH(sendData); index++) {
+        for (index = 0; index < (int)GET_ARRAY_LENGTH(sendData); index++) {
             if (sendData[index] != NULL) {
                 RFLiFree(sendData[index]);
             }
@@ -352,7 +399,7 @@ RFLErrcode makeNWC24MsgforExchange_(NWC24MsgObj* obj, RFLCharData* sendTarget, B
     ((RFLiCharData*)sendTarget)->localonly = 0;
     ((RFLiCharData*)sendTarget)->favorite = 0;
 
-    for (index = 0; index < (int)ARRAY_LENGTH(sendData); index++) {
+    for (index = 0; index < (int)GET_ARRAY_LENGTH(sendData); index++) {
         if (sendData[index] != NULL) {
             RFLiFree(sendData[index]);
         }
@@ -366,7 +413,7 @@ RFLErrcode makeNWC24MsgforExchange_(NWC24MsgObj* obj, RFLCharData* sendTarget, B
         }
 
         for (index = 0; index < NWC24_FRIEND_INFO_MAX; index++) {
-            NWC24FriendInfo info __attribute__((aligned(32)));
+            NWC24FriendInfo info ALIGN32;
             BOOL isEstablished = FALSE;
 
             NWC24Err errcode = NWC24ReadFriendInfo(&info, index);
@@ -411,7 +458,7 @@ RFLErrcode makeNWC24MsgforExchange_(NWC24MsgObj* obj, RFLCharData* sendTarget, B
                 lists[l] = tmp;
             }
 
-            for (i = 0; i < (int)ARRAY_LENGTH(receiver); i++) {
+            for (i = 0; i < (int)GET_ARRAY_LENGTH(receiver); i++) {
                 memcpy(&receiver[i], lists[i], sizeof(NWC24FriendInfo));
                 OSReport("Send To[%d]: %lld\n", i, receiver[i].addr.wiiId);
             }
@@ -419,7 +466,7 @@ RFLErrcode makeNWC24MsgforExchange_(NWC24MsgObj* obj, RFLCharData* sendTarget, B
             receiverNum = FRIEND_RECEIVE_COUNT;
         }
 
-        for (index = 0; index < (int)ARRAY_LENGTH(lists); index++) {
+        for (index = 0; index < (int)GET_ARRAY_LENGTH(lists); index++) {
             if (lists[index] != NULL) {
                 RFLiFree(lists[index]);
             }

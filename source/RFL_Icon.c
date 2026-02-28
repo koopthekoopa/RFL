@@ -181,15 +181,23 @@ void RFLiMakeIcon(void* buf, const RFLiCharInfo* info, RFLExpression expression,
 
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
     GXSetColorUpdate(GX_TRUE);
+#if RFL_BUILD < 20080306
+    GXDrawDone();
+#endif
     GXCopyTex(buf, GX_TRUE);
-    GXPixModeSync();
 
+#if RFL_BUILD >= 20080306
+    GXPixModeSync();
     if (RFLiGetManager()->mDrawIconCB == NULL) {
         GXDrawDone();
     }
     else {
         RFLiGetManager()->mDrawIconCB();
     }
+#else
+    GXDrawDone();
+    GXPixModeSync();
+#endif // RFL_BUILD
 
     RFLiFree(modelBuf);
 
@@ -199,6 +207,8 @@ void RFLiMakeIcon(void* buf, const RFLiCharInfo* info, RFLExpression expression,
     RFLiSetCoordinateData(&coordData);
 }
 
+#if RFL_BUILD >= 20080306
 void RFLSetIconDrawDoneCallback(RFLSimpleCB cb) {
     RFLiGetManager()->mDrawIconCB = cb;
 }
+#endif // RFL_BUILD
