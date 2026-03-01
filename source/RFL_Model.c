@@ -23,18 +23,15 @@
 #define VTX_COORDS_IN_TXC   2
 
 #define VTX_COORD_SIZE      sizeof(s16)
-#define VTX_POS_SIZE        (VTX_COORD_SIZE * VTX_COORDS_IN_POS)
-#define VTX_NRM_SIZE        (VTX_COORD_SIZE * VTX_COORDS_IN_NRM)
-#define VTX_TXC_SIZE        (VTX_COORD_SIZE * VTX_COORDS_IN_TXC)
 
-#define NUM_VTX_POS(size)   ((size) / VTX_POS_SIZE)
-#define SIZE_VTX_POS(count) ((count) * VTX_POS_SIZE)
+#define NUM_VTX_POS(size)   ((size) / (VTX_COORD_SIZE * VTX_COORDS_IN_POS))
+#define SIZE_VTX_POS(count) (((count) * VTX_COORD_SIZE) * VTX_COORDS_IN_POS)
 
-#define NUM_VTX_NRM(size)   ((size) / VTX_NRM_SIZE)
-#define SIZE_VTX_NRM(count) ((count) * VTX_NRM_SIZE)
+#define NUM_VTX_NRM(size)   ((size) / (VTX_COORD_SIZE * VTX_COORDS_IN_NRM))
+#define SIZE_VTX_NRM(count) (((count) * VTX_COORD_SIZE) * VTX_COORDS_IN_NRM)
 
-#define NUM_VTX_TXC(size)   ((size) / VTX_TXC_SIZE)
-#define SIZE_VTX_TXC(count) (count * VTX_TXC_SIZE)
+#define NUM_VTX_TXC(size)   ((size) / (VTX_COORD_SIZE * VTX_COORDS_IN_TXC))
+#define SIZE_VTX_TXC(count) (((count) * VTX_COORD_SIZE) * VTX_COORDS_IN_TXC)
 
 RFLiCoordinateData coordinateData = {1, 2, 0, FALSE, FALSE, FALSE};
 
