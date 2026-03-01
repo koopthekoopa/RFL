@@ -43,9 +43,8 @@ static void* allocSys_(u32 size, int alignment) {
     return MEMAllocFromExpHeapEx(RFLiGetManager()->mSystemHeap, size, alignment);
 }
 
-// DEBUG NON MATCH (https://decomp.me/scratch/R63gU)
 RFLErrcode RFLInitResAsync(void* workBuffer, void* resBuffer, u32 resSize, BOOL useDeluxTex) {
-    RFLErrcode errcode;
+    RFLErrcode errcode = RFLErrcode_NotAvailable;
 
     // Assertz
     RFLi_ASSERTLINE_NULL(resBuffer, 96);
@@ -89,7 +88,7 @@ RFLErrcode RFLInitResAsync(void* workBuffer, void* resBuffer, u32 resSize, BOOL 
                     size = (RFLi_WORK_SIZE - sizeof(RFLiSysManager));
                 }
                 RFLiGetManager()->mRootHeap = MEMCreateExpHeapEx(RFLiGetManager()->mWorkBuffer, size, 1);
-                RFLi_REPORT(" rootHeap  : 0x%08x - 0x%08x (%6dByte)\n", (u8*)RFLiGetManager()->mWorkBuffer, ((u8*)RFLiGetManager()->mWorkBuffer + size), size);
+                RFLi_REPORT(" rootHeap  : 0x%08x - 0x%08x (%6dByte)\n", (u8*)RFLiGetManager()->mWorkBuffer, (size + (u32)RFLiGetManager()->mWorkBuffer), size);
             }
 
             // Initialize system heap
@@ -153,6 +152,8 @@ RFLErrcode RFLInitResAsync(void* workBuffer, void* resBuffer, u32 resSize, BOOL 
             if (errcode != RFLErrcode_Busy && errcode != RFLErrcode_Success) {
                 RFLExit();
             }
+
+            (void)0; // for debug match
         }
         else {
             // we already done that!!

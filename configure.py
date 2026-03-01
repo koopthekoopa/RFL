@@ -255,7 +255,7 @@ config.libs = [
     RvlLib(
         "RVLFaceLib",
         [
-            Object(DebugEquivalent,     ReleaseMatching,    "RFL_System.c"),
+            Object(DebugMatching,       ReleaseMatching,    "RFL_System.c"),
             Object(DebugMatching,       ReleaseMatching,    "RFL_NANDLoader.c"),
             Object(DebugMatching,       ReleaseMatching,    "RFL_NANDAccess.c"),
             Object(DebugEquivalent,     ReleaseMatching,    "RFL_Model.c"),

@@ -598,17 +598,16 @@ void RFLDrawXluCore(const RFLCharModel* charModel, const RFLDrawCoreSetting* set
     }
 }
 
-// DEBUG NON MATCH AND RELEASE FAKE MATCH (https://decomp.me/scratch/WCvYt)
-void RFLiInitCharModelRes(RFLiCharModelRes* charModelRes /* r30 */, const RFLiCharInfo* info /* r29 */) {
-    RFLiPositionData noseTrans; // r31+0x38
-    RFLiPositionData beardTrans; // r31+0x2C
-    RFLiPositionData hairTrans; // r31+0x20
+void RFLiInitCharModelRes(RFLiCharModelRes* charModelRes, const RFLiCharInfo* info) {
+    RFLiPositionData noseTrans;
+    RFLiPositionData beardTrans;
+    RFLiPositionData hairTrans;
 
     GXSetMisc(GX_MT_XF_FLUSH, GX_FALSE);
     GXSetMisc(GX_MT_DL_SAVE_CONTEXT, GX_TRUE);
 
     {
-        RFLiCharShapeRes arg; // r31+0x264
+        RFLiCharShapeRes arg;
 
         arg.parts = RFLiPartsShp_Faceline;
         arg.index = info->faceline.type;
@@ -631,7 +630,7 @@ void RFLiInitCharModelRes(RFLiCharModelRes* charModelRes /* r30 */, const RFLiCh
     }
 
     {
-        RFLiCharShapeRes arg; // r31+0x220
+        RFLiCharShapeRes arg;
 
         arg.parts = RFLiPartsShp_Cap;
         arg.index = info->hair.type;
@@ -650,20 +649,13 @@ void RFLiInitCharModelRes(RFLiCharModelRes* charModelRes /* r30 */, const RFLiCh
         RFLiInitShapeRes(&arg);
 
         charModelRes->dlSizeCap = arg.dlSize;
-        charModelRes->vtxPosHair = &charModelRes->vtxPosCap[arg.vtxPosSize * 4 - arg.vtxPosSize];
-        charModelRes->vtxNrmHair = &charModelRes->vtxNrmCap[arg.vtxNrmSize * 4 - arg.vtxNrmSize];
+        charModelRes->vtxPosHair = &charModelRes->vtxPosCap[arg.vtxPosSize * VTX_COORDS_IN_POS];
+        charModelRes->vtxNrmHair = &charModelRes->vtxNrmCap[arg.vtxNrmSize * VTX_COORDS_IN_NRM];
         charModelRes->dlHair = charModelRes->dlNose + OSRoundUp32B(arg.dlSize) + offsetof(RFLiCharModelRes, dlCap);
     }
 
     {
-        RFLiCharShapeRes arg; // r31+0x1DC
-
-        // some weird crap going on 
-        #ifndef RFL_DEBUG
-        int fake_value = 4;
-        #else
-        #define fake_value 4
-        #endif // RFL_DEBUG
+        RFLiCharShapeRes arg;
 
         arg.parts = RFLiPartsShp_Hair;
         arg.index = info->hair.type;
@@ -680,18 +672,14 @@ void RFLiInitCharModelRes(RFLiCharModelRes* charModelRes /* r30 */, const RFLiCh
         RFLiInitShapeRes(&arg);
 
         charModelRes->dlSizeHair = arg.dlSize;
-        charModelRes->vtxPosForehead = &charModelRes->vtxPosHair[arg.vtxPosSize * fake_value - arg.vtxPosSize];
-        charModelRes->vtxNrmForehead = &charModelRes->vtxNrmHair[arg.vtxNrmSize * fake_value - arg.vtxNrmSize];
+        charModelRes->vtxPosForehead = &charModelRes->vtxPosHair[arg.vtxPosSize * VTX_COORDS_IN_POS];
+        charModelRes->vtxNrmForehead = &charModelRes->vtxNrmHair[arg.vtxNrmSize * VTX_COORDS_IN_NRM];
         charModelRes->dlForehead = charModelRes->dlHair + OSRoundUp32B(arg.dlSize);
         charModelRes->flipHair = info->hair.flip;
-
-        #ifdef RFL_DEBUG
-        #undef fake_value
-        #endif // RFL_DEBUG
     }
 
     {
-        RFLiCharShapeRes arg; // r31+0x198
+        RFLiCharShapeRes arg;
 
         arg.parts = RFLiPartsShp_Forehead;
         arg.index = info->hair.type;
@@ -711,7 +699,7 @@ void RFLiInitCharModelRes(RFLiCharModelRes* charModelRes /* r30 */, const RFLiCh
     }
 
     {
-        RFLiCharShapeRes arg; // r31+0x154
+        RFLiCharShapeRes arg;
 
         arg.parts = RFLiPartsShp_Beard;
         arg.index = info->beard.type;
@@ -731,10 +719,10 @@ void RFLiInitCharModelRes(RFLiCharModelRes* charModelRes /* r30 */, const RFLiCh
     }
 
     {
-        f32 scale; // f31
-        RFLiPositionData trans; // r31+0x14
+        f32 scale;
+        RFLiPositionData trans;
         {
-            RFLiCharShapeRes arg; // r31+0x110
+            RFLiCharShapeRes arg;
 
             scale = 0.4f + 0.175f * info->nose.scale;
 
@@ -759,7 +747,7 @@ void RFLiInitCharModelRes(RFLiCharModelRes* charModelRes /* r30 */, const RFLiCh
             charModelRes->dlSizeNose = arg.dlSize;
         }
         {
-            RFLiCharShapeRes arg; // r31+0xCC
+            RFLiCharShapeRes arg;
 
             arg.parts = RFLiPartsShp_Noseline;
             arg.index = info->nose.type;
@@ -782,7 +770,7 @@ void RFLiInitCharModelRes(RFLiCharModelRes* charModelRes /* r30 */, const RFLiCh
     }
 
     {
-        RFLiCharShapeRes arg; // r31+0x88
+        RFLiCharShapeRes arg;
 
         arg.parts = RFLiPartsShp_Mask;
         arg.index = info->faceline.type;
@@ -802,9 +790,9 @@ void RFLiInitCharModelRes(RFLiCharModelRes* charModelRes /* r30 */, const RFLiCh
     }
 
     {
-        RFLiCharShapeRes arg; // r31+0x44
-        f32 scale; // f30
-        RFLiPositionData trans; // r31+0x8
+        RFLiCharShapeRes arg;
+        f32 scale;
+        RFLiPositionData trans;
 
         scale = 0.15f * info->glass.scale + 0.4f;
 
@@ -867,8 +855,8 @@ void RFLiInitShapeRes(RFLiCharShapeRes* arg /* r30 */) {
     RFLi_ASSERTLINE_ALIGN(arg->dlBuf, 32, 1265);
 
     skipTxc = arg->parts == RFLiPartsShp_Nose || arg->parts == RFLiPartsShp_Forehead ||
-            arg->parts == RFLiPartsShp_Hair ||
-            arg->parts == RFLiPartsShp_Beard;
+              arg->parts == RFLiPartsShp_Hair ||
+              arg->parts == RFLiPartsShp_Beard;
 
     if (!skipTxc) {
         RFLi_ASSERTLINE_NULL(arg->vtxTxcBuf, 1273);
