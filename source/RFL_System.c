@@ -46,7 +46,6 @@ static void* allocSys_(u32 size, int alignment) {
 RFLErrcode RFLInitResAsync(void* workBuffer, void* resBuffer, u32 resSize, BOOL useDeluxTex) {
     RFLErrcode errcode = RFLErrcode_NotAvailable;
 
-    // Assertz
     RFLi_ASSERTLINE_NULL(resBuffer, 96);
     RFLi_ASSERTLINE_NULL(workBuffer, 97);
 
@@ -115,8 +114,8 @@ RFLErrcode RFLInitResAsync(void* workBuffer, void* resBuffer, u32 resSize, BOOL 
             RFLiGetManager()->mUseDeluxTex = useDeluxTex;
             RFLiGetManager()->mBrokenTypeList = FALSE;
 
-            // Prepare for icon and model
 #if RFL_BUILD >= 20080306
+            // Prepare for icon and model callback
             RFLSetIconDrawDoneCallback(FALSE);
             RFLSetModelDrawDoneCallback(FALSE);
 #endif // RFL_BUILD
@@ -156,7 +155,7 @@ RFLErrcode RFLInitResAsync(void* workBuffer, void* resBuffer, u32 resSize, BOOL 
             (void)0; // for debug match
         }
         else {
-            // we already done that!!
+            // We already done that!!
             RFLi_REPORT(" already initialized.\n");
             errcode = RFLErrcode_Success;
         }
@@ -174,16 +173,20 @@ void RFLExit() {
     if (RFLiGetManager()) {
         RFLWaitAsync();
 
+        // Get last results
         sRFLLastErrCode = RFLGetAsyncStatus();
         sRFLLastReason = RFLGetLastReason();
         sRFLBrokenType = RFLiGetManager()->mBrokenTypeList;
 
+        // Be free, cache...
         if (RFLIsResourceCached()) {
             RFLFreeCachedResource();
         }
 
+        // Goodbye NAND
         RFLiExitAccessInfo();
 
+        // Be free, heap...
         MEMDestroyExpHeap(RFLiGetManager()->mTmpHeap);
         MEMDestroyExpHeap(RFLiGetManager()->mSystemHeap);
         MEMDestroyExpHeap(RFLiGetManager()->mRootHeap);
