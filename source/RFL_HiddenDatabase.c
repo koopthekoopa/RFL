@@ -566,6 +566,8 @@ static void writeData_(const RFLiHiddenCharData* data /* r27 */) {
     s16 onhdb = -1; // r28
     s16 target = getFirstBlank_(); // r30
 
+    offset; // *sob* (for debug match)
+
     onhdb = RFLiSearchHiddenData((RFLCreateID*)&data->createID);
 
     if (onhdb != -1) {
