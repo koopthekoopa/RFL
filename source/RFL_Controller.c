@@ -243,7 +243,9 @@ static void readbuffer_(s32 chan, void* buffer, BOOL isChannel) {
         return;
     }
 
-    RFLi_ASSERTLINE(manager->mTmpReadBuffer == ((void*)0) /* NULL */, 456);
+    // clang-format off
+    RFLi_ASSERTLINE(manager->mTmpReadBuffer == ((void *)0) /* NULL */, 456);
+    // clang-format on
 
     manager->mTmpReadBuffer = RFLiAlloc32(size);
     manager->mReadBuffer = buffer;
@@ -409,7 +411,9 @@ static void writecallback_(s32 chan, s32 result) {
     if (result == WPAD_ERR_OK) {
         s32 read;
 
-        RFLi_ASSERTLINE(manager->mVerifyBuffer == ((void*)0) /* NULL */, 786);
+        // clang-format off
+        RFLi_ASSERTLINE(manager->mVerifyBuffer == ((void *)0) /* NULL */, 786);
+        // clang-format on
 
         manager->mVerifyBuffer = RFLiAlloc32(sizeof(RFLiCtrlBuffer));
         memset(manager->mVerifyBuffer, 0, sizeof(RFLiCtrlBuffer));
@@ -506,7 +510,9 @@ static void replacecallback_(s32 chan, s32 result) {
         s32 read;
         u16 offset;
 
-        RFLi_ASSERTLINE(manager->mVerifyBuffer == ((void*)0), 972);
+        // clang-format off
+        RFLi_ASSERTLINE(manager->mVerifyBuffer == ((void *)0), 972);
+        // clang-format on
 
         manager->mVerifyBuffer = RFLiAlloc32(4);
         memset(manager->mVerifyBuffer, 0, 4);
