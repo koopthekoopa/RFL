@@ -9,11 +9,11 @@
 
 #include <string.h>
 
-#define RFL_CTRL_IDENTIFIER  'RNCD'
+#define RFL_CTRL_IDENTIFIER 'RNCD'
 
-#define MAX_RETRIES         3
+#define MAX_RETRIES 3
 
-#define WPAD_FACE_ADDR      0x0000
+#define WPAD_FACE_ADDR 0x0000
 
 static void clearDatabase_(RFLiCtrlBuffer* buffer) {
     int i;
@@ -64,8 +64,7 @@ BOOL RFLiCheckCtrlBufferCore(const RFLiCtrlBuffer* buffer, u8 index, RFLiCtrlChe
         if ((buffer->mSecretFlag & flag) != 0) {
             return FALSE;
         }
-    }
-    else if (type == RFLiCtrlCheckType_HiddenOnly) {
+    } else if (type == RFLiCtrlCheckType_HiddenOnly) {
         if ((buffer->mSecretFlag & flag) == 0) {
             return FALSE;
         }
@@ -104,8 +103,7 @@ static BOOL checkCRC_(RFLiCtrlBuffer* buffer) {
 static BOOL checkValidate_(RFLiCtrlBuffer* buffer) {
     if (buffer->mIdentifier == RFL_CTRL_IDENTIFIER) {
         return checkCRC_(buffer);
-    }
-    else {
+    } else {
         return FALSE;
     }
 }
@@ -134,8 +132,7 @@ static void validBufferFound_(RFLiCtrlBuffer* buffer, s32 chan) {
 
     if (RFLiGetIsolation()) {
         RFLiEndWorking(RFLErrcode_Success);
-    }
-    else {
+    } else {
         RFLiWriteCtrlToHiddenDB(manager->mBuffer[chan], RFLiGetCtrlBufManager()->mReadIsChMode);
     }
 }
@@ -199,8 +196,7 @@ static void readcallback_(s32 chan, s32 result) {
 
                 if (validbuf != NULL) {
                     validBufferFound_(validbuf, chan);
-                }
-                else if (!errorAndReRead_(chan)) {
+                } else if (!errorAndReRead_(chan)) {
                     RFLiFree(manager->mTmpReadBuffer);
                     manager->mTmpReadBuffer = NULL;
 
@@ -247,7 +243,7 @@ static void readbuffer_(s32 chan, void* buffer, BOOL isChannel) {
         return;
     }
 
-    RFLi_ASSERTLINE(manager->mTmpReadBuffer == ((void *)0) /* NULL */, 456);
+    RFLi_ASSERTLINE(manager->mTmpReadBuffer == ((void*)0) /* NULL */, 456);
 
     manager->mTmpReadBuffer = RFLiAlloc32(size);
     manager->mReadBuffer = buffer;
@@ -316,8 +312,7 @@ static void saveOfficialToCtrl_() {
 
     if (probe != WPAD_ERR_OK) {
         RFLiEndWorkingReason(RFLErrcode_Controllerfail, probe);
-    }
-    else {
+    } else {
         RFLiStartWorking();
         writebuffer_(chan, buffer, 0);
     }
@@ -330,8 +325,7 @@ static void closeOfficialOnly_() {
 static void saveOfficialOnlyOpened_() {
     if (RFLGetAsyncStatus() == RFLErrcode_Success) {
         RFLiSaveOpenedDatabaseAsync(closeOfficialOnly_);
-    }
-    else {
+    } else {
         saveOfficialToCtrl_();
     }
 }
@@ -350,7 +344,8 @@ static BOOL verify_(void* buf1, void* buf2, u16 size) {
         if (*ptr1 != *ptr2) {
             return FALSE;
         }
-        ptr1++; ptr2++;
+        ptr1++;
+        ptr2++;
     }
 
     return TRUE;
@@ -365,7 +360,8 @@ static BOOL errorAndReWrite_(s32 chan) {
     manager->mRetry++;
 
     if (manager->mRetry < MAX_RETRIES) {
-        s32 write = WPADWriteFaceData(chan, manager->mWriteBuffer, sizeof(RFLiCtrlBuffer), WPAD_FACE_ADDR + (manager->mWriteCount * sizeof(RFLiCtrlBuffer)), writecallback_);
+        s32 write = WPADWriteFaceData(chan, manager->mWriteBuffer, sizeof(RFLiCtrlBuffer),
+                                      WPAD_FACE_ADDR + (manager->mWriteCount * sizeof(RFLiCtrlBuffer)), writecallback_);
         if (write != WPAD_ERR_OK) {
             RFLiEndWorkingReason(RFLErrcode_Controllerfail, write);
         }
@@ -383,12 +379,10 @@ static void verifycallback_(s32 chan, s32 result) {
             if (verify_(manager->mWriteBuffer, manager->mVerifyBuffer, sizeof(RFLiCtrlBuffer))) {
                 if (manager->mWriteCount == 0) {
                     writebuffer_(chan, manager->mBuffer[chan], 1);
-                }
-                else {
+                } else {
                     RFLiEndWorking(RFLErrcode_Success);
                 }
-            }
-            else if (!errorAndReWrite_(chan)) {
+            } else if (!errorAndReWrite_(chan)) {
                 RFLiEndWorking(RFLErrcode_Savefail);
             }
             break;
@@ -415,20 +409,20 @@ static void writecallback_(s32 chan, s32 result) {
     if (result == WPAD_ERR_OK) {
         s32 read;
 
-        RFLi_ASSERTLINE(manager->mVerifyBuffer == ((void *)0) /* NULL */, 786);
+        RFLi_ASSERTLINE(manager->mVerifyBuffer == ((void*)0) /* NULL */, 786);
 
         manager->mVerifyBuffer = RFLiAlloc32(sizeof(RFLiCtrlBuffer));
         memset(manager->mVerifyBuffer, 0, sizeof(RFLiCtrlBuffer));
 
-        read = WPADReadFaceData(chan, manager->mVerifyBuffer, sizeof(RFLiCtrlBuffer), WPAD_FACE_ADDR + (manager->mWriteCount * sizeof(RFLiCtrlBuffer)), verifycallback_);
+        read = WPADReadFaceData(chan, manager->mVerifyBuffer, sizeof(RFLiCtrlBuffer),
+                                WPAD_FACE_ADDR + (manager->mWriteCount * sizeof(RFLiCtrlBuffer)), verifycallback_);
         if (read != WPAD_ERR_OK) {
             RFLiFree(manager->mVerifyBuffer);
             manager->mVerifyBuffer = NULL;
 
             RFLiEndWorkingReason(RFLErrcode_Controllerfail, read);
         }
-    }
-    else {
+    } else {
         if (!errorAndReWrite_(chan)) {
             RFLiEndWorkingReason(RFLErrcode_Controllerfail, result);
         }
@@ -481,12 +475,10 @@ static void replaceverifycallback_(s32 chan, s32 result) {
             if (verify_(manager->mVerifyBuffer, ((u8*)(manager->mReplaceBuf[manager->mWriteCount]) + OFFSET), 4)) {
                 if (manager->mWriteCount == 0) {
                     replacebuffer_(chan, manager->mWriteBuffer, 1);
-                }
-                else {
+                } else {
                     saveOfficialOnly_();
                 }
-            }
-            else if (!errorAndReplace_(chan)) {
+            } else if (!errorAndReplace_(chan)) {
                 RFLiEndWorking(RFLErrcode_Savefail);
             }
             break;
@@ -513,8 +505,8 @@ static void replacecallback_(s32 chan, s32 result) {
     if (result == WPAD_ERR_OK) {
         s32 read;
         u16 offset;
-        
-        RFLi_ASSERTLINE(manager->mVerifyBuffer == ((void *)0), 972);
+
+        RFLi_ASSERTLINE(manager->mVerifyBuffer == ((void*)0), 972);
 
         manager->mVerifyBuffer = RFLiAlloc32(4);
         memset(manager->mVerifyBuffer, 0, 4);
@@ -528,8 +520,7 @@ static void replacecallback_(s32 chan, s32 result) {
 
             RFLiEndWorkingReason(RFLErrcode_Controllerfail, read);
         }
-    }
-    else {
+    } else {
         if (!errorAndReWrite_(chan)) {
             RFLiEndWorkingReason(RFLErrcode_Controllerfail, result);
         }
@@ -552,7 +543,7 @@ static void replacebuffer_(s32 chan, RFLiCtrlBuffer* buffer, u8 count) {
     createCRC_(replaced);
 
     offset = (count * sizeof(RFLiCtrlBuffer)) + OFFSET;
-    
+
     write = WPADWriteFaceData(chan, ((u8*)walker + OFFSET), 4, WPAD_FACE_ADDR + offset, replacecallback_);
     if (write != WPAD_ERR_OK) {
         RFLiEndWorkingReason(RFLErrcode_Controllerfail, write);
@@ -582,11 +573,10 @@ static BOOL setDataCoreBuffer_(const RFLiCharInfo* src, RFLiCtrlBuffer* buffer, 
 
     if (isSecret) {
         buffer->mSecretFlag |= flag;
-    }
-    else {
+    } else {
         buffer->mSecretFlag &= ~flag;
     }
-    
+
     return TRUE;
 }
 
@@ -645,8 +635,7 @@ static void fillToWriteCtrl_() {
     probe = WPADProbe(chan, &type);
     if (probe != WPAD_ERR_OK) {
         RFLiEndWorkingReason(RFLErrcode_Controllerfail, probe);
-    }
-    else {
+    } else {
         replacebuffer_(chan, buffer, 0);
     }
 }
@@ -688,8 +677,7 @@ RFLErrcode RFLiSaveControllerAsync(s32 chan, u16 deleted) {
         RFLiUpdateMiddleDB(&manager->mHiddenMDB);
         fillToWriteCtrl_();
         return RFLGetAsyncStatus();
-    }
-    else {
+    } else {
         return RFLiUpdateMiddleDBAsync(&manager->mHiddenMDB, fillToWriteCtrl_, FALSE);
     }
 }
@@ -700,9 +688,9 @@ BOOL RFLiFormatControllerData(s32 chan) {
     RFLi_ASSERTLINE_RANGE(chan, 0, WPAD_MAX_CONTROLLERS, 1304);
 
     if (chan < 0 || chan >= WPAD_MAX_CONTROLLERS) {
-        return RFLErrcode_WrongParam; // @BUG Should be FALSE
+        return RFLErrcode_WrongParam;  // @BUG Should be FALSE
     }
-    
+
     manager = RFLiGetCtrlBufManager();
     if (manager == NULL) {
         return FALSE;
@@ -844,11 +832,11 @@ BOOL RFLiIsAvailableControllerData(s32 chan, u8 index, RFLiCtrlCheckType type) {
     RFLi_ASSERTLINE_RANGE(index, 0, RFL_MAX_CTRL_BUFFER, 1504);
 
     if (chan < 0 || chan >= WPAD_MAX_CONTROLLERS) {
-        return RFLErrcode_WrongParam; // @BUG: Should be FALSE
+        return RFLErrcode_WrongParam;  // @BUG: Should be FALSE
     }
 
     if (index >= RFL_MAX_CTRL_BUFFER) {
-        return RFLErrcode_WrongParam; // @BUG: Should be FALSE
+        return RFLErrcode_WrongParam;  // @BUG: Should be FALSE
     }
 
     if (!RFLAvailable()) {
