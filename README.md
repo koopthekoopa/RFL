@@ -20,7 +20,6 @@ Progress
 Currently, the release builds are fully matching! However, a few functions for debug builds are not matching (but are 1:1 logically).  
 
 The following functions not matching for debug builds are:  
-* `RFL_HiddenDatabase.c`/`writeData_`
 * `RFL_MakeTex.c`/`RFLiMakeTexture`
 * `RFL_Model.c`/`RFLiInitShapeRes`
 
