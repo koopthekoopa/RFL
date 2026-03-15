@@ -6,9 +6,10 @@
 #include <RVLFaceLibInternal.h>
 
 #include <internal/RFLi_FaceConfig.h>
-#include <internal/RFLi_FaceConfig/colors.h>
+// clang-format off
 #include <internal/RFLi_FaceConfig/offsets.h>
-
+#include <internal/RFLi_FaceConfig/colors.h>
+// clang-format on
 
 #include <revolution/gx.h>
 #include <revolution/mtx.h>
