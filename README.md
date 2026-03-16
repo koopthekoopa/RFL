@@ -9,7 +9,8 @@ This repository does not contain any of the original objects. An existing copy o
 
 Supported versions:
 - 20080306 (from Challenge Me: Word Puzzles; **Default**)
-- 20080216 (from Wii Menu)
+- 20080216 (from Wii Menu 4.3)
+- 20070609 (from Wii Sports; USA Rev.1)
 
 > [!WARNING]
 > Building is only supported for version **20080306** (Challenge Me: Word Puzzles)  
