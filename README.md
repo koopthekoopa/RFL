@@ -24,7 +24,7 @@ The following functions not matching for debug builds are:
 * `RFL_MakeTex.c`/`RFLiMakeTexture`
 * `RFL_Model.c`/`RFLiInitShapeRes`
 
-ependencies
+Dependencies
 ============
 
 Windows
