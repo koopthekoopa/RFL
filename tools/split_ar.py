@@ -32,6 +32,16 @@ def get_disc_file(path_find):
             return filename
         if filename.is_file() and filename.suffix == '.rvz':
             return filename
+        if filename.is_file() and filename.suffix == '.wia':
+            return filename
+        if filename.is_file() and filename.suffix == '.cios':
+            return filename
+        if filename.is_file() and filename.suffix == '.nfs':
+            return filename
+        if filename.is_file() and filename.suffix == '.gcz':
+            return filename
+        if filename.is_file() and filename.suffix == '.tgc':
+            return filename
 
 
 # Simple function :P
