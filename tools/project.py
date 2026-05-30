@@ -1,6 +1,13 @@
 ###
-# project generator based on https://github.com/encounter/dtk-template
-# with all the DOL/REL-specific stuff ripped out
+# decomp-toolkit project generator
+# Generates build.ninja and objdiff.json.
+#
+# This generator is intentionally project-agnostic
+# and shared between multiple projects. Any configuration
+# specific to a project should be added to `configure.py`.
+#
+# If changes are made, please submit a PR to
+# https://github.com/encounter/dtk-template
 ###
 
 import io
@@ -11,11 +18,10 @@ import platform
 import sys
 from pathlib import Path
 from typing import (
+    IO,
     Any,
     Callable,
-    cast,
     Dict,
-    IO,
     Iterable,
     List,
     Optional,
@@ -23,6 +29,7 @@ from typing import (
     Tuple,
     TypedDict,
     Union,
+    cast,
 )
 
 from . import ninja_syntax
@@ -38,11 +45,13 @@ if sys.platform == "cygwin":
 Library = Dict[str, Any]
 
 
+PrecompiledHeader = Dict[str, Any]
+
+
 class Object:
-    def __init__(self, completed_debug: bool, completed_release: bool, name: str, **options: Any) -> None:
+    def __init__(self, completed: bool, name: str, **options: Any) -> None:
         self.name = name
-        self.completed_debug = completed_debug
-        self.completed_release = completed_release
+        self.completed = completed
         self.options: Dict[str, Any] = {
             "add_to_all": None,
             "asflags": None,
@@ -59,21 +68,19 @@ class Object:
             "shift_jis": None,
             "source": name,
             "src_dir": None,
-            "debug_second": False,
-            "release_second": False,
         }
         self.options.update(options)
 
         # Internal
         self.src_path: Optional[Path] = None
         self.asm_path: Optional[Path] = None
-        # self.src_obj_path: Optional[Path] = None
+        self.src_obj_path: Optional[Path] = None
         self.asm_obj_path: Optional[Path] = None
-        # self.ctx_path: Optional[Path] = None
+        self.ctx_path: Optional[Path] = None
 
     def resolve(self, config: "ProjectConfig", lib: Library) -> "Object":
         # Use object options, then library options
-        obj = Object(self.completed_debug, self.completed_release, self.name, **lib)
+        obj = Object(self.completed, self.name, **lib)
         for key, value in self.options.items():
             if value is not None or key not in obj.options:
                 obj.options[key] = value
@@ -114,28 +121,10 @@ class Object:
                 Path(obj.options["asm_dir"]) / obj.options["source"]
             ).with_suffix(".s")
         base_name = Path(self.name).with_suffix("")
-        obj.build_dir_ = build_dir
-        obj.base_name_ = base_name
-        # obj.src_obj_path = build_dir / "source" / f"{base_name}.o"
+        obj.src_obj_path = build_dir / "src" / f"{base_name}.o"
         obj.asm_obj_path = build_dir / "mod" / f"{base_name}.o"
-        # obj.ctx_path = build_dir / "source" / f"{base_name}.ctx"
+        obj.ctx_path = build_dir / "src" / f"{base_name}.ctx"
         return obj
-
-    def src_obj_path(self, debug: bool):
-        folder = "debug" if debug else "release"
-        return self.build_dir_ / "source" / folder / f"{self.base_name_}.o"
-
-    def target_obj_path(self, debug: bool):
-        folder = "debug" if debug else "release"
-        return Path("obj") / folder / f"{self.base_name_}.o"
-
-    def ctx_path(self, debug: bool):
-        folder = "debug" if debug else "release"
-        return self.build_dir_ / "source" / folder / f"{self.base_name_}.ctx"
-
-    def target_asm_path(self, debug: bool):
-        folder = "debug" if debug else "release"
-        return Path("asm") / folder / f"{self.base_name_}.s"
 
 
 class ProgressCategory:
@@ -148,7 +137,7 @@ class ProjectConfig:
     def __init__(self) -> None:
         # Paths
         self.build_dir: Path = Path("build")  # Output build files
-        self.src_dir: Path = Path("source")  # C/C++/asm source files
+        self.src_dir: Path = Path("src")  # C/C++/asm source files
         self.tools_dir: Path = Path("tools")  # Python scripts
         self.asm_dir: Optional[Path] = Path(
             "asm"
@@ -171,15 +160,24 @@ class ProjectConfig:
 
         # Project config
         self.non_matching: bool = False
+        self.build_rels: bool = True  # Build REL files
         self.check_sha_path: Optional[Path] = None  # Path to version.sha1
+        self.config_path: Optional[Path] = None  # Path to config.json
         self.generate_map: bool = False  # Generate map file(s)
         self.asflags: Optional[List[str]] = None  # Assembler flags
         self.ldflags: Optional[List[str]] = None  # Linker flags
         self.libs: Optional[List[Library]] = None  # List of libraries
+        self.precompiled_headers: Optional[List[PrecompiledHeader]] = (
+            None  # List of precompiled headers
+        )
         self.linker_version: Optional[str] = None  # mwld version
-        # self.version: Optional[str] = None  # Version name
+        self.version: Optional[str] = None  # Version name
         self.warn_missing_config: bool = False  # Warn on missing unit configuration
         self.warn_missing_source: bool = False  # Warn on missing source file
+        self.rel_strip_partial: bool = True  # Generate PLFs with -strip_partial
+        self.rel_empty_file: Optional[str] = (
+            None  # Object name for generating empty RELs
+        )
         self.shift_jis = (
             True  # Convert source files from UTF-8 to Shift JIS automatically
         )
@@ -202,6 +200,12 @@ class ProjectConfig:
         self.link_order_callback: Optional[Callable[[int, List[str]], List[str]]] = (
             None  # Callback to add/remove/reorder units within a module
         )
+        self.context_exclude_globs: List[
+            str
+        ] = []  # Globs to exclude from context files
+        self.context_defines: List[
+            str
+        ] = []  # Macros to define at the top of context files
 
         # Progress output and report.json config
         self.progress = True  # Enable report.json generation and CLI progress output
@@ -230,6 +234,7 @@ class ProjectConfig:
             "src_dir",
             "tools_dir",
             "check_sha_path",
+            "config_path",
             "ldflags",
             "linker_version",
             "libs",
@@ -253,7 +258,7 @@ class ProjectConfig:
 
     # Gets the output path for build-related files.
     def out_path(self) -> Path:
-        return self.build_dir
+        return self.build_dir / str(self.version)
 
     # Gets the path to the compilers directory.
     # Exits the program if neither `compilers_path` nor `compilers_tag` is provided.
@@ -280,8 +285,8 @@ class ProjectConfig:
     def use_wibo(self) -> bool:
         return (
             self.wibo_tag is not None
-            and sys.platform == "linux"
-            and platform.machine() in ("i386", "x86_64")
+            and (sys.platform == "linux" or sys.platform == "darwin")
+            and platform.machine() in ("i386", "x86_64", "aarch64", "arm64")
             and self.wrapper is None
         )
 
@@ -305,7 +310,7 @@ def file_is_c(path: Path) -> bool:
 
 
 def file_is_cpp(path: Path) -> bool:
-    return path.suffix.lower() in (".cc", ".cp", ".cpp", ".cxx")
+    return path.suffix.lower() in (".cc", ".cp", ".cpp", ".cxx", ".pch++")
 
 
 def file_is_c_cpp(path: Path) -> bool:
@@ -351,22 +356,29 @@ def make_flags_str(flags: Optional[List[str]]) -> str:
     return " ".join(flags)
 
 
+def get_pch_out_name(config: ProjectConfig, pch: PrecompiledHeader) -> str:
+    pch_rel_path = Path(pch["source"])
+    pch_out_name = pch_rel_path.with_suffix(".mch")
+    # Use absolute path as a workaround to allow this target to be matched with absolute paths in depfiles.
+    #
+    # Without this any object which includes the PCH would depend on the .mch filesystem entry but not the
+    # corresponding Ninja task, so the MCH would not be implicitly rebuilt when the PCH is modified.
+    return os.path.abspath(config.out_path() / "include" / pch_out_name)
+
+
 # Unit configuration
 class BuildConfigUnit(TypedDict):
     object: Optional[str]
-    debug: bool
     name: str
-    completed: bool
     autogenerated: bool
 
 
 # Module configuration
 class BuildConfigModule(TypedDict):
     name: str
-    debug: bool
-    # module_id: int
+    module_id: int
     ldscript: str
-    # entry: str
+    entry: str
     units: List[BuildConfigUnit]
 
 
@@ -377,52 +389,41 @@ class BuildConfigLink(TypedDict):
 
 # Build configuration generated by decomp-toolkit
 class BuildConfig(BuildConfigModule):
-    # version: str
+    version: str
     modules: List[BuildConfigModule]
     links: List[BuildConfigLink]
 
 
-# Turn the project config into a build config
-# normally there would be a dtk step in here that splits
-# a DOL or REL with auto splits and the like but we don't
-# use dtk at all for that stuff
+# Load decomp-toolkit generated config.json
 def load_build_config(
-    config: ProjectConfig
+    config: ProjectConfig, build_config_path: Path
 ) -> Optional[BuildConfig]:
+    if not build_config_path.is_file():
+        return None
 
-    build_config = {
-        "modules": [],
-        "links": [
-            {"modules": []}
-        ],
-        "name": "root",
-        "ldscript": "TODO_ldscript",
-        "units": []
-    }
-    for lib in config.libs:
-        for debug in [True, False]:
-            folder = "debug" if debug else "release"
-            module = {
-                "name": lib["lib"],
-                "ldscript": "TODO_ldscript",
-                "units": [],
-                "debug": debug
-            }
-            for object in lib["objects"]:
-                base_name = Path(object.name).with_suffix("")
-                unit = {
-                    "object": Path("obj") / folder / f"{base_name}.o",
-                    "name": object.name,
-                    "debug": debug,
-                    "autogenerated": False,
-                    "completed": object.completed_debug if debug else object.completed_release
-                }
-                module["units"].append(unit)
+    def versiontuple(v: str) -> Tuple[int, ...]:
+        return tuple(map(int, (v.split("."))))
 
-            build_config["modules"].append(module)
-            build_config["links"][0]["modules"].append(module["name"])
+    f = open(build_config_path, "r", encoding="utf-8")
+    build_config: BuildConfig = json.load(f)
+    config_version = build_config.get("version")
+    if config_version is None:
+        print("Invalid config.json, regenerating...")
+        f.close()
+        os.remove(build_config_path)
+        return None
+
+    dtk_version = str(config.dtk_tag)[1:]  # Strip v
+    if versiontuple(config_version) < versiontuple(dtk_version):
+        print("Outdated config.json, regenerating...")
+        f.close()
+        os.remove(build_config_path)
+        return None
+
+    f.close()
 
     # Apply link order callback
+    """
     if config.link_order_callback:
         modules: List[BuildConfigModule] = [build_config, *build_config["modules"]]
         for module in modules:
@@ -439,6 +440,7 @@ def load_build_config(
                 )
             module["units"] = units
 
+    """
     return build_config
 
 
@@ -446,7 +448,7 @@ def load_build_config(
 def generate_build(config: ProjectConfig) -> None:
     config.validate()
     objects = config.objects()
-    build_config = load_build_config(config)  # , config.out_path() / "config.json")
+    build_config = load_build_config(config, config.out_path() / "config.json")
     generate_build_ninja(config, objects, build_config)
     generate_objdiff_config(config, objects, build_config)
     generate_compile_commands(config, objects, build_config)
@@ -500,7 +502,7 @@ def generate_build_ninja(
     decompctx = config.tools_dir / "decompctx.py"
     n.rule(
         name="decompctx",
-        command=f"$python {decompctx} $in -o $out -d $out.d $includes",
+        command=f"$python {decompctx} $in -o $out -d $out.d $includes $excludes $defines",
         description="CTX $in",
         depfile="$out.d",
         deps="gcc",
@@ -597,10 +599,7 @@ def generate_build_ninja(
         sys.exit("ProjectConfig.sjiswrap_tag missing")
 
     wrapper = config.compiler_wrapper()
-    # Only add an implicit dependency on wibo if we download it
-    wrapper_implicit: Optional[Path] = None
     if wrapper is not None and config.use_wibo():
-        wrapper_implicit = wrapper
         n.build(
             outputs=wrapper,
             rule="download_tool",
@@ -610,6 +609,11 @@ def generate_build_ninja(
                 "tag": config.wibo_tag,
             },
         )
+
+    wrapper_implicit: Optional[Path] = None
+    if wrapper is not None and (wrapper.exists() or config.use_wibo()):
+        wrapper_implicit = wrapper
+
     wrapper_cmd = f"{wrapper} " if wrapper else ""
 
     compilers = config.compilers()
@@ -667,16 +671,27 @@ def generate_build_ninja(
     mwcc_cmd = f"{wrapper_cmd}{mwcc} $cflags -MMD -c $in -o $basedir"
     mwcc_implicit: List[Optional[Path]] = [compilers_implicit or mwcc, wrapper_implicit]
 
-    mwcc_link_cmd = f"{wrapper_cmd}{mwcc}"
+    # MWCC for build archive
+    mwcc_generic_link_cmd = f"{wrapper_cmd}{mwcc}"
 
     # MWCC with UTF-8 to Shift JIS wrapper
     mwcc_sjis_cmd = f"{wrapper_cmd}{sjiswrap} {mwcc} $cflags -MMD -c $in -o $basedir"
     mwcc_sjis_implicit: List[Optional[Path]] = [*mwcc_implicit, sjiswrap]
 
+    # MWCC for precompiled headers
+    mwcc_pch_cmd = f"{wrapper_cmd}{mwcc} $cflags -MMD -c $in -o $basedir -precompile $basefilestem.mch"
+    mwcc_pch_implicit: List[Optional[Path]] = [*mwcc_implicit]
+
+    # MWCC for precompiled headers with UTF-8 to Shift JIS wrapper
+    mwcc_pch_sjis_cmd = f"{wrapper_cmd}{sjiswrap} {mwcc} $cflags -MMD -c $in -o $basedir -precompile $basefilestem.mch"
+    mwcc_pch_sjis_implicit: List[Optional[Path]] = [*mwcc_implicit, sjiswrap]
+
     # MWCC with extab post-processing
-    mwcc_extab_cmd = f"{CHAIN}{mwcc_cmd} && {dtk} extab clean --padding \"$extab_padding\" $out $out"
+    mwcc_extab_cmd = (
+        f'{CHAIN}{mwcc_cmd} && {dtk} extab clean --padding "$extab_padding" $out $out'
+    )
     mwcc_extab_implicit: List[Optional[Path]] = [*mwcc_implicit, dtk]
-    mwcc_sjis_extab_cmd = f"{CHAIN}{mwcc_sjis_cmd} && {dtk} extab clean --padding \"$extab_padding\" $out $out"
+    mwcc_sjis_extab_cmd = f'{CHAIN}{mwcc_sjis_cmd} && {dtk} extab clean --padding "$extab_padding" $out $out'
     mwcc_sjis_extab_implicit: List[Optional[Path]] = [*mwcc_sjis_implicit, dtk]
 
     # MWLD
@@ -698,12 +713,24 @@ def generate_build_ninja(
         transform_dep = config.tools_dir / "transform_dep.py"
         mwcc_cmd += f" && $python {transform_dep} $basefile.d $basefile.d"
         mwcc_sjis_cmd += f" && $python {transform_dep} $basefile.d $basefile.d"
+        mwcc_pch_cmd += f" && $python {transform_dep} $basefile.d $basefile.d"
+        mwcc_pch_sjis_cmd += f" && $python {transform_dep} $basefile.d $basefile.d"
         mwcc_extab_cmd += f" && $python {transform_dep} $basefile.d $basefile.d"
         mwcc_sjis_extab_cmd += f" && $python {transform_dep} $basefile.d $basefile.d"
         mwcc_implicit.append(transform_dep)
         mwcc_sjis_implicit.append(transform_dep)
+        mwcc_pch_implicit.append(transform_dep)
+        mwcc_pch_sjis_implicit.append(transform_dep)
         mwcc_extab_implicit.append(transform_dep)
         mwcc_sjis_extab_implicit.append(transform_dep)
+
+    n.comment("Build archive")
+    n.rule(
+        name="build_archive",
+        command=f"{mwcc_generic_link_cmd} -o $out -library $in",
+        description="ARCHIVE $out",
+    )
+    n.newline()
 
     n.comment("Link ELF file")
     n.rule(
@@ -712,14 +739,6 @@ def generate_build_ninja(
         description="LINK $out",
         rspfile="$out.rsp",
         rspfile_content="$in_newline",
-    )
-    n.newline()
-
-    n.comment("Build archive")
-    n.rule(
-        name="build_archive",
-        command=f"{mwcc_link_cmd} -o $out -library $in",
-        description="ARCHIVE $out",
     )
     n.newline()
 
@@ -783,29 +802,23 @@ def generate_build_ninja(
     )
     n.newline()
 
-    ###
-    # Extract obj rule
-    ###
-    gnu_ar = binutils / f"powerpc-eabi-ar{EXE}"
-    extract_command = f"{gnu_ar} xN $index $in $file --output $out_dir"
-    if not is_windows():
-        extract_command += '; chmod 0644 $out_dir/$file'
-    n.comment("Extract obj")
+    n.comment("Build precompiled header")
     n.rule(
-        name="extract_obj",
-        command=extract_command,
-        description="extract $out",
+        name="mwcc_pch",
+        command=mwcc_pch_cmd,
+        description="PCH $out",
+        depfile="$basefile.d",
+        deps="gcc",
     )
     n.newline()
 
-    ###
-    # Dump asm rule
-    ###
-    n.comment("Dump asm")
+    n.comment("Build precompiled header (with UTF-8 to Shift JIS wrapper)")
     n.rule(
-        name="dump_asm",
-        command=f"{dtk} -L error elf disasm $in $out",
-        description="disasm $out",
+        name="mwcc_pch_sjis",
+        command=mwcc_pch_sjis_cmd,
+        description="PCH $out",
+        depfile="$basefile.d",
+        deps="gcc",
     )
     n.newline()
 
@@ -826,12 +839,16 @@ def generate_build_ninja(
         )
         n.newline()
 
-    def write_custom_step(step: str, prev_step: Optional[str] = None) -> None:
-        implicit: List[str | Path] = []
+    def write_custom_step(
+        step: str,
+        prev_step: Optional[str] = None,
+        extra_inputs: Optional[List[str]] = None,
+    ) -> None:
+        implicit: List[Union[str, Path]] = []
         if config.custom_build_steps and step in config.custom_build_steps:
             n.comment(f"Custom build steps ({step})")
             for custom_step in config.custom_build_steps[step]:
-                outputs = cast(List[str | Path], custom_step.get("outputs"))
+                outputs = cast(List[Union[str, Path]], custom_step.get("outputs"))
 
                 if isinstance(outputs, list):
                     implicit.extend(outputs)
@@ -850,15 +867,20 @@ def generate_build_ninja(
                     dyndep=custom_step.get("dyndep", None),
                 )
                 n.newline()
+
         n.build(
             outputs=step,
             rule="phony",
             inputs=implicit,
             order_only=prev_step,
+            implicit=extra_inputs,
         )
 
     # Add all build steps needed before we compile (e.g. processing assets)
-    write_custom_step("pre-compile")
+    pch_out_names = [
+        get_pch_out_name(config, pch) for pch in config.precompiled_headers or []
+    ]
+    write_custom_step("pre-compile", extra_inputs=pch_out_names)
 
     ###
     # Source files
@@ -871,23 +893,22 @@ def generate_build_ninja(
     class LinkStep:
         def __init__(self, config: BuildConfigModule) -> None:
             self.name = config["name"]
-            self.debug = config["debug"]
-            # self.module_id = config["module_id"]
-            self.ldscript: Optional[Path] = Path(config["ldscript"])
-            # self.entry = config["entry"]
+            self.module_id = config["module_id"]
+            # self.ldscript: Optional[Path] = Path(config["ldscript"])
+            #self.entry = config["entry"]
             self.inputs: List[str] = []
 
         def add(self, obj: Path) -> None:
             self.inputs.append(serialize_path(obj))
 
         def output(self) -> Path:
-            return Path("lib") / f"{self.lib_name()}.a"
-
-        def lib_name(self) -> str:
-            name = self.name
-            if self.debug:
-                name += "D"
-            return name
+            """
+            if self.module_id == 0:
+                return build_path / f"{self.name}.dol"
+            else:
+                return build_path / self.name / f"{self.name}.rel"
+            """
+            return build_path / self.name / f"{self.name}_sdk.a"
 
         """
         def partial_output(self) -> Path:
@@ -898,7 +919,7 @@ def generate_build_ninja(
         """
 
         def write(self, n: ninja_syntax.Writer) -> None:
-            n.comment(f"Link {self.lib_name()}")
+            n.comment(f"Link {self.name}")
             n.build(
                 outputs=self.output(),
                 rule="build_archive",
@@ -975,14 +996,46 @@ def generate_build_ninja(
         source_inputs: List[Path] = []
         source_added: Set[Path] = set()
 
-        def c_build(obj: Object, src_path: Path, debug: bool) -> Optional[Path]:
-            # Avoid creating duplicate build rules
-            src_obj_path = obj.src_obj_path(debug)
-            if src_obj_path is None or src_obj_path in source_added:
-                return src_obj_path
-            source_added.add(src_obj_path)
+        if config.precompiled_headers:
+            for pch in config.precompiled_headers:
+                src_path_rel_str = Path(pch["source"])
+                src_path_rel = Path(src_path_rel_str)
+                pch_out_name = src_path_rel.with_suffix(".mch")
+                pch_out_abs_path = Path(get_pch_out_name(config, pch))
+                # Add appropriate language flag if it doesn't exist already
+                cflags = pch["cflags"]
+                if not any(flag.startswith("-lang") for flag in cflags):
+                    if file_is_cpp(src_path_rel):
+                        cflags.insert(0, "-lang=c++")
+                    else:
+                        cflags.insert(0, "-lang=c")
 
-            cflags = obj.options["cflags_debug"] if debug else obj.options["cflags_release"]
+                cflags_str = make_flags_str(cflags)
+                shift_jis = pch.get("shift_jis", config.shift_jis)
+
+                n.comment(f"Precompiled header {pch_out_name}")
+                n.build(
+                    outputs=pch_out_abs_path,
+                    rule="mwcc_pch_sjis" if shift_jis else "mwcc_pch",
+                    inputs=f"include/{src_path_rel_str}",
+                    variables={
+                        "mw_version": Path(pch["mw_version"]),
+                        "cflags": cflags_str,
+                        "basedir": os.path.dirname(pch_out_abs_path),
+                        "basefile": pch_out_abs_path.with_suffix(""),
+                        "basefilestem": pch_out_abs_path.stem,
+                    },
+                    implicit=mwcc_pch_sjis_implicit if shift_jis else mwcc_pch_implicit,
+                )
+                n.newline()
+
+        def c_build(obj: Object, src_path: Path) -> Optional[Path]:
+            # Avoid creating duplicate build rules
+            if obj.src_obj_path is None or obj.src_obj_path in source_added:
+                return obj.src_obj_path
+            source_added.add(obj.src_obj_path)
+
+            cflags = obj.options["cflags"]
             extra_cflags = obj.options["extra_cflags"]
 
             # Add appropriate language flag if it doesn't exist already
@@ -1009,25 +1062,28 @@ def generate_build_ninja(
             variables = {
                 "mw_version": Path(obj.options["mw_version"]),
                 "cflags": cflags_str,
-                "basedir": os.path.dirname(src_obj_path),
-                "basefile": src_obj_path.with_suffix(""),
+                "basedir": os.path.dirname(obj.src_obj_path),
+                "basefile": obj.src_obj_path.with_suffix(""),
             }
 
             if obj.options["shift_jis"] and obj.options["extab_padding"] is not None:
                 build_rule = "mwcc_sjis_extab"
                 build_implcit = mwcc_sjis_extab_implicit
-                variables["extab_padding"] = "".join(f"{i:02x}" for i in obj.options["extab_padding"])
+                variables["extab_padding"] = "".join(
+                    f"{i:02x}" for i in obj.options["extab_padding"]
+                )
             elif obj.options["shift_jis"]:
                 build_rule = "mwcc_sjis"
                 build_implcit = mwcc_sjis_implicit
             elif obj.options["extab_padding"] is not None:
                 build_rule = "mwcc_extab"
                 build_implcit = mwcc_extab_implicit
-                variables["extab_padding"] = "".join(f"{i:02x}" for i in obj.options["extab_padding"])
-
-            n.comment(f"{obj.name}: {lib_name} (linked {obj.completed_debug if debug else obj.completed_release})")
+                variables["extab_padding"] = "".join(
+                    f"{i:02x}" for i in obj.options["extab_padding"]
+                )
+            n.comment(f"{obj.name}: {lib_name} (linked {obj.completed})")
             n.build(
-                outputs=src_obj_path,
+                outputs=obj.src_obj_path,
                 rule=build_rule,
                 inputs=src_path,
                 variables=variables,
@@ -1035,9 +1091,8 @@ def generate_build_ninja(
                 order_only="pre-compile",
             )
 
-            ctx_path = obj.ctx_path(debug)
             # Add ctx build rule
-            if ctx_path is not None:
+            if obj.ctx_path is not None:
                 include_dirs = []
                 for flag in all_cflags:
                     if (
@@ -1047,19 +1102,26 @@ def generate_build_ninja(
                     ):
                         include_dirs.append(flag[3:])
                 includes = " ".join([f"-I {d}" for d in include_dirs])
+                excludes = " ".join([f"-x {d}" for d in config.context_exclude_globs])
+                defines = " ".join([f"-D {d}" for d in config.context_defines])
+
                 n.build(
-                    outputs=ctx_path,
+                    outputs=obj.ctx_path,
                     rule="decompctx",
                     inputs=src_path,
                     implicit=decompctx,
-                    variables={"includes": includes},
+                    variables={
+                        "includes": includes,
+                        "excludes": excludes,
+                        "defines": defines,
+                    },
                 )
             n.newline()
 
             if obj.options["add_to_all"]:
-                source_inputs.append(src_obj_path)
+                source_inputs.append(obj.src_obj_path)
 
-            return src_obj_path
+            return obj.src_obj_path
 
         def asm_build(
             obj: Object, src_path: Path, obj_path: Optional[Path]
@@ -1104,52 +1166,20 @@ def generate_build_ninja(
                     link_step.add(Path(obj_path))
                 return
 
-            # add extraction build rule
-            target_obj_path = obj.target_obj_path(build_obj["debug"])
-            index = 1
-            if build_obj["debug"]:
-                if obj.options["debug_second"]:
-                    index = 2
-            else:
-                if obj.options["release_second"]:
-                    index = 2
-
-            n.build(
-                outputs=target_obj_path,
-                rule="extract_obj",
-                # TODO not project generic
-                inputs="orig/RVLFaceLibD.a" if build_obj["debug"] else "orig/RVLFaceLib.a",
-                implicit=binutils_implicit,
-                variables={
-                    "index": str(index),
-                    "file": Path(target_obj_path).name,
-                    "out_dir": Path("obj") / ("debug" if build_obj["debug"] else "release") / Path(obj_name).parent,
-                }
-            )
-
-            # add asm dump rule
-            n.build(
-                outputs=obj.target_asm_path(build_obj["debug"]),
-                rule="dump_asm",
-                inputs=target_obj_path,
-                implicit=dtk,
-                order_only="pre-compile",
-            )
-
-            link_built_obj = build_obj["completed"]
+            link_built_obj = obj.completed
             built_obj_path: Optional[Path] = None
             if obj.src_path is not None and obj.src_path.exists():
                 check_path_case(obj.src_path)
                 if file_is_c_cpp(obj.src_path):
                     # Add C/C++ build rule
-                    built_obj_path = c_build(obj, obj.src_path, build_obj["debug"])
+                    built_obj_path = c_build(obj, obj.src_path)
                 elif file_is_asm(obj.src_path):
                     # Add assembler build rule
-                    built_obj_path = asm_build(obj, obj.src_path, obj.src_obj_path(build_obj["debug"]))
+                    built_obj_path = asm_build(obj, obj.src_path, obj.src_obj_path)
                 else:
                     sys.exit(f"Unknown source file type {obj.src_path}")
             else:
-                if config.warn_missing_source or link_built_obj:
+                if config.warn_missing_source or obj.completed:
                     print(f"Missing source file {obj.src_path}")
                 link_built_obj = False
 
@@ -1170,44 +1200,31 @@ def generate_build_ninja(
                 # Use the original (extracted) object
                 link_step.add(Path(obj_path))
 
-        """
         # Add DOL link step
         link_step = LinkStep(build_config)
         for unit in build_config["units"]:
             add_unit(unit, link_step)
         link_steps.append(link_step)
-        """
 
-        extract_implicit = []
-        for module in build_config["modules"]:
-            for unit in module["units"]:
-                for debug in [True, False]:
-                    obj_name = unit["name"]
-                    obj = objects.get(obj_name)
-                    extract_implicit.append(obj.target_obj_path(debug))
-                    extract_implicit.append(obj.target_asm_path(debug))
-        n.build("extract_all", rule="phony", implicit=extract_implicit)
-        n.newline()
-
-        # if config.build_rels:
-        # Add REL link steps
-        for module in build_config["modules"]:
-            module_link_step = LinkStep(module)
-            for unit in module["units"]:
-                add_unit(unit, module_link_step)
-            # Add empty object to empty RELs
-            if len(module_link_step.inputs) == 0:
-                if config.rel_empty_file is None:
-                    sys.exit("ProjectConfig.rel_empty_file missing")
-                add_unit(
-                    {
-                        "object": None,
-                        "name": config.rel_empty_file,
-                        "autogenerated": True,
-                    },
-                    module_link_step,
-                )
-            link_steps.append(module_link_step)
+        if config.build_rels:
+            # Add REL link steps
+            for module in build_config["modules"]:
+                module_link_step = LinkStep(module)
+                for unit in module["units"]:
+                    add_unit(unit, module_link_step)
+                # Add empty object to empty RELs
+                if len(module_link_step.inputs) == 0:
+                    if config.rel_empty_file is None:
+                        sys.exit("ProjectConfig.rel_empty_file missing")
+                    add_unit(
+                        {
+                            "object": None,
+                            "name": config.rel_empty_file,
+                            "autogenerated": True,
+                        },
+                        module_link_step,
+                    )
+                link_steps.append(module_link_step)
         n.newline()
 
         # Check if all compiler versions exist
@@ -1230,7 +1247,6 @@ def generate_build_ninja(
         for step in link_steps:
             step.write(n)
             link_outputs.append(step.output())
-
         n.newline()
 
         # Add all build steps needed after linking and before GC/Wii native format generation
@@ -1327,6 +1343,7 @@ def generate_build_ninja(
             inputs=source_inputs,
         )
         n.newline()
+
         """
         ###
         # Check hash
@@ -1366,7 +1383,6 @@ def generate_build_ninja(
                 configure_script,
                 python_lib,
                 report_path,
-                "extract_all",
             ],
             order_only="post-build",
         )
@@ -1507,15 +1523,17 @@ def generate_build_ninja(
         n.newline()
         """
 
-    """
     ###
     # Split DOL
     ###
+    split_ar = config.tools_dir / "split_ar.py"
     build_config_path = build_path / "config.json"
+    dtk_version = str(config.dtk_tag)[1:]
     n.comment("Split DOL into relocatable objects")
     n.rule(
         name="split",
-        command=f"{dtk} dol split $in $out_dir",
+        #command=f"{dtk} dol split $in $out_dir",
+        command=f"$python {split_ar} --dtk-version {dtk_version} --dtk {dtk} --output $out_dir $in",
         description="SPLIT $in",
         depfile="$out_dir/dep",
         deps="gcc",
@@ -1528,7 +1546,6 @@ def generate_build_ninja(
         variables={"out_dir": build_path},
     )
     n.newline()
-    """
 
     ###
     # Regenerate on change
@@ -1544,7 +1561,7 @@ def generate_build_ninja(
         outputs=["build.ninja", "objdiff.json"],
         rule="configure",
         implicit=[
-            # build_config_path,
+            build_config_path,
             configure_script,
             python_lib,
             python_lib_dir / "ninja_syntax.py",
@@ -1564,8 +1581,8 @@ def generate_build_ninja(
             n.default("progress")
         else:
             n.default(ok_path)
-    # else:
-    #    n.default(build_config_path)
+    else:
+        n.default(build_config_path)
 
     # Write build.ninja
     with open("build.ninja", "w", encoding="utf-8") as f:
@@ -1597,13 +1614,22 @@ def generate_objdiff_config(
     objdiff_config: Dict[str, Any] = {
         "min_version": "2.0.0-beta.5",
         "custom_make": ninja,
-        "build_target": True,
+        "build_target": False,
         "watch_patterns": [
             "*.c",
+            "*.cc",
             "*.cp",
             "*.cpp",
+            "*.cxx",
+            "*.c++",
             "*.h",
+            "*.hh",
+            "*.hp",
             "*.hpp",
+            "*.hxx",
+            "*.h++",
+            "*.pch",
+            "*.pch++",
             "*.inc",
             "*.py",
             "*.yml",
@@ -1654,11 +1680,8 @@ def generate_objdiff_config(
         obj_path, obj_name = build_obj["object"], build_obj["name"]
         base_object = Path(obj_name).with_suffix("")
         name = str(Path(module_name) / base_object).replace(os.sep, "/")
-        parts = obj_name.split("/")
-        if build_obj["debug"]:
-            parts[0] += "D"
         unit_config: Dict[str, Any] = {
-            "name": "/".join(parts),
+            "name": name,
             "target_path": obj_path,
             "base_path": None,
             "scratch": None,
@@ -1684,7 +1707,7 @@ def generate_objdiff_config(
 
         src_exists = obj.src_path is not None and obj.src_path.exists()
         if src_exists:
-            unit_config["base_path"] = obj.src_obj_path(build_obj["debug"])
+            unit_config["base_path"] = obj.src_obj_path
             unit_config["metadata"]["source_path"] = obj.src_path
 
         # Filter out include directories
@@ -1697,9 +1720,8 @@ def generate_objdiff_config(
                 and not flag.startswith("-I-")
             )
 
-        cflags = obj.options["cflags_debug"] if build_obj["debug"] else obj.options["cflags_release"]
         all_cflags = list(
-            filter(keep_flag, cflags + obj.options["extra_cflags"])
+            filter(keep_flag, obj.options["cflags"] + obj.options["extra_cflags"])
         )
         reverse_fn_order = False
         for flag in all_cflags:
@@ -1725,25 +1747,24 @@ def generate_objdiff_config(
             if src_exists:
                 unit_config["scratch"].update(
                     {
-                        "ctx_path": obj.ctx_path(build_obj["debug"]),
+                        "ctx_path": obj.ctx_path,
                         "build_ctx": True,
                     }
                 )
-        category_opt: List[str] | str = "debug" if build_obj["debug"] else "release"
+        category_opt: Union[List[str], str] = obj.options["progress_category"]
         if isinstance(category_opt, list):
             progress_categories.extend(category_opt)
         elif category_opt is not None:
             progress_categories.append(category_opt)
         unit_config["metadata"].update(
             {
-                "complete": build_obj["completed"] if src_exists else None,
+                "complete": obj.completed if src_exists else None,
                 "reverse_fn_order": reverse_fn_order,
                 "progress_categories": progress_categories,
             }
         )
         objdiff_config["units"].append(unit_config)
 
-    """
     # Add DOL units
     for unit in build_config["units"]:
         progress_categories = []
@@ -1752,7 +1773,6 @@ def generate_objdiff_config(
         if len(build_config["modules"]) > 0:
             progress_categories.append("dol")
         add_unit(unit, build_config["name"], progress_categories)
-    """
 
     # Add REL units
     for module in build_config["modules"]:
@@ -1774,7 +1794,7 @@ def generate_objdiff_config(
         )
 
     if len(build_config["modules"]) > 0:
-        # add_category("dol", "DOL")
+        add_category("dol", "DOL")
         if config.progress_modules:
             add_category("modules", "Modules")
         if config.progress_each_module:
@@ -1900,7 +1920,7 @@ def generate_compile_commands(
         # Skip unresolved objects
         if (
             obj.src_path is None
-            or obj.src_obj_path(build_obj["debug"]) is None
+            or obj.src_obj_path is None
             or not file_is_c_cpp(obj.src_path)
         ):
             return
@@ -1970,7 +1990,7 @@ def generate_compile_commands(
                     cflags.append(flag)
                     continue
 
-        append_cflags(obj.options["cflags_debug"] if build_obj["debug"] else obj.options["cflags_release"])
+        append_cflags(obj.options["cflags"])
         append_cflags(obj.options["extra_cflags"])
         cflags.extend(config.extra_clang_flags)
         cflags.extend(obj.options["extra_clang_flags"])
@@ -1978,7 +1998,7 @@ def generate_compile_commands(
         unit_config = {
             "directory": Path.cwd(),
             "file": obj.src_path,
-            "output": obj.src_obj_path(build_obj["debug"]),
+            "output": obj.src_obj_path,
             "arguments": [
                 "clang",
                 "-nostdinc",
@@ -1988,11 +2008,10 @@ def generate_compile_commands(
                 "-c",
                 obj.src_path,
                 "-o",
-                obj.src_obj_path(build_obj["debug"]),
+                obj.src_obj_path,
             ],
         }
-        if build_obj["debug"]:
-            clangd_config.append(unit_config)
+        clangd_config.append(unit_config)
 
     # Add DOL units
     for unit in build_config["units"]:
@@ -2055,6 +2074,7 @@ def calculate_progress(config: ProjectConfig) -> None:
         total_code = measures.get("total_code", 0)
         matched_code = measures.get("matched_code", 0)
         matched_code_percent = measures.get("matched_code_percent", 0)
+        fuzzy_match_percent = measures.get("fuzzy_match_percent", 0)
         total_data = measures.get("total_data", 0)
         matched_data = measures.get("matched_data", 0)
         matched_data_percent = measures.get("matched_data_percent", 0)
@@ -2065,7 +2085,7 @@ def calculate_progress(config: ProjectConfig) -> None:
         complete_units = measures.get("complete_units", 0)
 
         progress_print(
-            f"  {name}: {matched_code_percent:.2f}% matched, {complete_code_percent:.2f}% linked ({complete_units} / {total_units} files)"
+            f"  {name}: {fuzzy_match_percent:.2f}% fuzzy, {matched_code_percent:.2f}% matched, {complete_code_percent:.2f}% linked ({complete_units} / {total_units} files)"
         )
         progress_print(
             f"    Code: {matched_code} / {total_code} bytes ({matched_functions} / {total_functions} functions)"

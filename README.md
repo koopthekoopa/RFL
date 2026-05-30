@@ -1,7 +1,7 @@
 Revolution Face Library
 =======================
 
-A work-in-progress decompilation of the Revolution Face Library.  
+A decompilation of the Revolution Face Library.  
 
 The library is responsible for handling Miis on the Nintendo Wii.  
 
@@ -24,13 +24,13 @@ The following functions not matching for debug builds are:
 * `RFL_MakeTex.c`/`RFLiMakeTexture`
 * `RFL_Model.c`/`RFLiInitShapeRes`
 
-Dependencies
+ependencies
 ============
 
 Windows
 --------
 
-On Windows, it's recommended to use native tooling. WSL or msys2 are not required.  
+On Windows, it's **highly recommended** to use native tooling. WSL or msys2 are **not** required.  
 When running under WSL, [objdiff](#diffing) is unable to get filesystem notifications for automatic rebuilds.
 
 - Install [Python](https://www.python.org/downloads/) and add it to `%PATH%`.
@@ -47,24 +47,14 @@ macOS
   brew install ninja
   ```
 
-- Install [wine-crossover](https://github.com/Gcenx/homebrew-wine):
-
-  ```sh
-  brew install --cask --no-quarantine gcenx/wine/wine-crossover
-  ```
-
-After OS upgrades, if macOS complains about `Wine Crossover.app` being unverified, you can unquarantine it using:
-
-```sh
-sudo xattr -rd com.apple.quarantine '/Applications/Wine Crossover.app'
-```
+[wibo](https://github.com/decompals/wibo), a minimal 32-bit Windows binary wrapper, will be automatically downloaded and used.
 
 Linux
 ------
 
 - Install [ninja](https://github.com/ninja-build/ninja/wiki/Pre-built-Ninja-packages).
-- For non-x86(\_64) platforms: Install wine from your package manager.
-  - For x86(\_64), [wibo](https://github.com/decompals/wibo), a minimal 32-bit Windows binary wrapper, will be automatically downloaded and used.
+
+[wibo](https://github.com/decompals/wibo), a minimal 32-bit Windows binary wrapper, will be automatically downloaded and used.
 
 Building
 ========
@@ -75,14 +65,9 @@ Building
   git clone https://github.com/koopthekoopa/RFL.git
   ```
 
-- Extract the library archive:
-  - Replace `SC5PGN.iso` with the path to your copy of *Challenge Me*.
-
-  ```sh
-  dtk vfs cp SC5PGN.iso/build/libs/Debug/RVLFaceLibD.a SC5PGN.iso/build/libs/Release/RVLFaceLib.a orig/
-  ```
-
-  - Only extract the archive, *not* the objects within the archives. The extraction of the objects from the archive are handled as part of the build.
+- Copy your disc image of *Challenge Me: Word Puzzles* to `orig`.
+  - Supported formats: ISO (GCM), RVZ, WIA, WBFS, CISO, NFS, GCZ, TGC
+  - After the initial build, the disc image can be deleted to save space.
 
 - Configure:
 
@@ -90,7 +75,7 @@ Building
   python configure.py
   ```
 
-  Both debug and release objects are configured to build at the same time, so there is no need to configure this with command-line options. (Thanks [@robojumper](https://github.com/robojumper)!)
+  To use a version other than `20080306_DBG`, specify it with `--version`.
 
 - Build:
 
@@ -105,10 +90,6 @@ Once the initial build succeeds, an `objdiff.json` should exist in the project r
 
 Download the latest release from [encounter/objdiff](https://github.com/encounter/objdiff). Under project settings, set `Project directory`. The configuration should be loaded automatically.
 
-Select an object from the left sidebar to begin diffing. Changes to the project will rebuild automatically: changes to source files, headers, or `configure.py`.
+Select an object from the left sidebar to begin diffing. Changes to the project will rebuild automatically: changes to source files, headers, `configure.py`, `splits.txt` or `symbols.txt`.
 
-Credits
--------
-[doldecomp/dolsdk2004](https://www.github.com/doldecomp/dolsdk2004)  
-[kiwi515/ogws](https://www.github.com/kiwi515/ogws)  
-[doldecomp/sdk_2009-12-11](https://www.github.com/doldecomp/sdk_2009-12-11)  
+![](assets/objdiff.png)

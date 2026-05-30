@@ -29,7 +29,8 @@ from tools.project import (
 # Game versions
 DEFAULT_VERSION = 0
 VERSIONS = [
-    "GAMEID",  # 0
+    "20080306_DBG",  # 0
+    "20080306_REL",  # 1
 ]
 
 parser = argparse.ArgumentParser()
@@ -72,6 +73,11 @@ parser.add_argument(
     action="store_true",
     help="generate map file(s)",
 )
+parser.add_argument(
+    "--debug",
+    action="store_true",
+    help="build with debug info (non-matching)",
+)
 if not is_windows():
     parser.add_argument(
         "--wrapper",
@@ -101,7 +107,7 @@ parser.add_argument(
     "--ninja",
     metavar="BINARY",
     type=Path,
-    help="path to ninja binary (optional)"
+    help="path to ninja binary (optional)",
 )
 parser.add_argument(
     "--verbose",
@@ -144,7 +150,6 @@ config.non_matching = args.non_matching
 config.sjiswrap_path = args.sjiswrap
 config.ninja_path = args.ninja
 config.progress = args.progress
-config.progress_modules = False
 if not is_windows():
     config.wrapper = args.wrapper
 # Don't build asm unless we're --non-matching
@@ -152,14 +157,15 @@ if not config.non_matching:
     config.asm_dir = None
 
 # Tool versions
-config.binutils_tag = "2.42-1"
-config.compilers_tag = "20231018"
-config.dtk_tag = "v1.6.1"
-config.objdiff_tag = "v3.0.0-beta.8"
-config.sjiswrap_tag = "v1.2.1"
-config.wibo_tag = "0.6.16"
+config.binutils_tag = "2.42-2"
+config.compilers_tag = "20251118"
+config.dtk_tag = "v1.7.5"
+config.objdiff_tag = "v3.6.1"
+config.sjiswrap_tag = "v1.2.2"
+config.wibo_tag = "1.0.3"
 
 # Project
+config.config_path = Path("config") / config.version / "config.json"
 config.check_sha_path = Path("config") / config.version / "build.sha1"
 config.asflags = [
     "-mgekko",
@@ -172,9 +178,11 @@ config.ldflags = [
     "-fp hardware",
     "-nodefaults",
 ]
+if args.debug:
+    config.ldflags.append("-g")  # Or -gdwarf-2 for Wii linkers
 if args.map:
     config.ldflags.append("-mapunused")
-    config.ldflags.append("-listclosure")  # For Wii linkers
+    # config.ldflags.append("-listclosure") # For Wii linkers
 
 # Use for any additional files that should cause a re-configure when modified
 config.reconfig_deps = []
@@ -186,6 +194,7 @@ config.scratch_preset_id = None
 # Base flags, common to most GC/Wii games.
 # Generally leave untouched, with overrides added below.
 cflags_base = [
+    "-nodefaults",
     "-proc gekko",
     "-fp hardware",
     "-enum int",
@@ -224,54 +233,50 @@ cflags_opt_release = [
     "-DNDEBUG",
 ]
 
-config.linker_version = "GC/3.0a5.2"
+config.linker_version = "GC/1.3.2"
 
-# Helper function for Revolution libraries
-def RvlLib(lib_name: str, objects: List[Object]) -> Dict[str, Any]:
-    return {
-        "lib": lib_name,
-        "mw_version": "GC/3.0a5.2",
-        "cflags_debug": cflags_opt_debug,
-        "cflags_release": cflags_opt_release,
-        "objects": objects,
-    }
+if config.version.endswith("DBG"):
+    cflags_use = cflags_opt_debug
+else:
+    cflags_use = cflags_opt_release
 
-DebugMatching = True                   # Object matches and should be linked
-DebugNonMatching = False               # Object does not match and should not be linked
-DebugEquivalent = config.non_matching  # Object should be linked when configured with --non-matching
 
-ReleaseMatching = True                   # Object matches and should be linked
-ReleaseNonMatching = False               # Object does not match and should not be linked
-ReleaseEquivalent = config.non_matching  # Object should be linked when configured with --non-matching
+Matching = True                   # Object matches and should be linked
+NonMatching = False               # Object does not match and should not be linked
+Equivalent = config.non_matching  # Object should be linked when configured with --non-matching
 
 
 # Object is only matching for specific versions
 def MatchingFor(*versions):
     return config.version in versions
 
+
 config.warn_missing_config = True
-config.warn_missing_source = False
+config.warn_missing_source = True
 config.libs = [
-    RvlLib(
-        "RVLFaceLib",
-        [
-            Object(DebugMatching,       ReleaseMatching,    "RFL_System.c"),
-            Object(DebugMatching,       ReleaseMatching,    "RFL_NANDLoader.c"),
-            Object(DebugMatching,       ReleaseMatching,    "RFL_NANDAccess.c"),
-            Object(DebugEquivalent,     ReleaseMatching,    "RFL_Model.c"),
-            Object(DebugEquivalent,     ReleaseMatching,    "RFL_MakeTex.c"),
-            Object(DebugMatching,       ReleaseMatching,    "RFL_Icon.c"),
-            Object(DebugMatching,       ReleaseMatching,    "RFL_HiddenDatabase.c"),
-            Object(DebugMatching,       ReleaseMatching,    "RFL_Database.c"),
-            Object(DebugMatching,       ReleaseMatching,    "RFL_Controller.c"),
-            Object(DebugMatching,       ReleaseMatching,    "RFL_MiddleDatabase.c"),
-            Object(DebugMatching,       ReleaseMatching,    "RFL_MakeRandomFace.c"),
-            Object(DebugMatching,       ReleaseMatching,    "RFL_DefaultDatabase.c"),
-            Object(DebugMatching,       ReleaseMatching,    "RFL_DataUtility.c"),
-            Object(DebugMatching,       ReleaseMatching,    "RFL_NWC24.c"),
-            Object(DebugMatching,       ReleaseMatching,    "RFL_Format.c"),
+    {
+        "lib": "RVLFaceLib",
+        "mw_version": "GC/3.0a5.2",
+        "cflags": cflags_use,
+        "progress_category": "main",
+        "objects": [
+            Object(Matching,   "RFL_System.c"),
+            Object(Matching,   "RFL_NANDLoader.c"),
+            Object(Matching,   "RFL_NANDAccess.c"),
+            Object(MatchingFor("20080306_REL"), "RFL_Model.c"),
+            Object(MatchingFor("20080306_REL"), "RFL_MakeTex.c"),
+            Object(Matching,   "RFL_Icon.c"),
+            Object(Matching,   "RFL_HiddenDatabase.c"),
+            Object(Matching,   "RFL_Database.c"),
+            Object(Matching,   "RFL_Controller.c"),
+            Object(Matching,   "RFL_MiddleDatabase.c"),
+            Object(Matching,   "RFL_MakeRandomFace.c"),
+            Object(Matching,   "RFL_DefaultDatabase.c"),
+            Object(Matching,   "RFL_DataUtility.c"),
+            Object(Matching,   "RFL_NWC24.c"),
+            Object(Matching,   "RFL_Format.c"),
         ],
-    ),
+    }
 ]
 
 
@@ -288,6 +293,7 @@ def link_order_callback(module_id: int, objects: List[str]) -> List[str]:
         return objects + ["dummy.c"]
     return objects
 
+
 # Uncomment to enable the link order callback.
 # config.link_order_callback = link_order_callback
 
@@ -295,15 +301,14 @@ def link_order_callback(module_id: int, objects: List[str]) -> List[str]:
 # Optional extra categories for progress tracking
 # Adjust as desired for your project
 config.progress_categories = [
-    ProgressCategory("release", "Release"),
-    ProgressCategory("debug", "Debug"),
+    ProgressCategory("main", "Library code"),
 ]
 config.progress_each_module = args.verbose
 # Optional extra arguments to `objdiff-cli report generate`
 config.progress_report_args = [
     # Marks relocations as mismatching if the target value is different
     # Default is "functionRelocDiffs=none", which is most lenient
-    "--config functionRelocDiffs=data_value",
+    # "--config functionRelocDiffs=data_value",
 ]
 
 if args.mode == "configure":
