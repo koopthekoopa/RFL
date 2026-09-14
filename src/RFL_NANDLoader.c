@@ -5,7 +5,6 @@
 
 #include <internal/RFLi_Debug.h>
 
-#include <private/nand.h>
 #include <revolution/nand.h>
 #include <revolution/os.h>
 

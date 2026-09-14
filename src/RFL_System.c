@@ -40,7 +40,7 @@ u32 RFLGetWorkSize(BOOL useDeluxTex) {
     }
 }
 
-static void* allocSys_(u32 size, int alignment) {
+static void* allocSys_(u32 size, int alignment) { /* unused */
     return MEMAllocFromExpHeapEx(RFLiGetManager()->mSystemHeap, size, alignment);
 }
 
